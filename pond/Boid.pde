@@ -27,9 +27,9 @@ class Boid {
     velocity = new PVector(cos(angle), sin(angle));
 
     location = new PVector(x, y);
-    r = 1.0;
-    maxspeed = 3;
-    maxforce = 0.02;
+    r = 100.0;
+    maxspeed = 4;
+    maxforce = 0.03;
   }
 
   void run(ArrayList<Boid> boids) {
@@ -37,6 +37,12 @@ class Boid {
     update();
     borders();
     render();
+  }
+  
+  void pull(ArrayList<Boid> boids,float x,float y) {
+    PVector pull = new PVector(x,y);
+    pull.mult(2.0);
+    applyForce(pull);
   }
 
   void applyForce(PVector force) {
@@ -50,7 +56,7 @@ class Boid {
     PVector ali = align(boids);      // Alignment
     PVector coh = cohesion(boids);   // Cohesion
     // Arbitrarily weight these forces
-    sep.mult(1.5);
+    sep.mult(2.0);
     ali.mult(1.0);
     coh.mult(1.0);
     // Add the force vectors to acceleration

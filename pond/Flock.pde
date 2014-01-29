@@ -16,6 +16,12 @@ class Flock {
   void addBoid(Boid b) {
     boids.add(b);
   }
+  
+  void pull(float x,float y) {
+    for (Boid b : boids) {
+      b.pull(boids,x,y);  
+    }
+  }
 
 }
 
