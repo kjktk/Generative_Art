@@ -1,9 +1,12 @@
 import fullscreen.*;
 
 Flock flock;
-float x,y,r;
-boolean click = false;
 
+boolean click = false;
+float[] x = new float[10];
+float[] y = new float[10];
+float[] r = new float[10];
+int c;
 
 void setup() {
   //new FullScreen(this).enter();
@@ -12,9 +15,9 @@ void setup() {
   size(1280, 720);
   flock = new Flock();
   // Add an initial set of boids into the system
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 50; i++) {
     int flockType = Math.round(random(0,4));
-    flock.addBoid(new Boid(width/2,height/2,flockType));
+    flock.addBoid(new Boid(random(width),random(height),flockType));
   }
 }
 
@@ -22,8 +25,10 @@ void draw() {
   background(0);
   flock.run();
   if (click) {
-    r+=10;
-    ellipse(x,y,r,r);
+    for (int i = 0; i < c; i++){
+      r[i]+=10;
+      ellipse(x[i],y[i],r[i],r[i]);
+    }
   }
   
 }
@@ -32,10 +37,15 @@ void mousePressed() {
   //int flockType = Math.round(random(0,4));
   //flock.addBoid(new Boid(mouseX,mouseY,flockType));
   flock.pull(mouseX,mouseY);
-  x = mouseX;
-  y = mouseY;
-  r = 0;
-  click = true;
+  if(c < 10){
+    x[c] = mouseX;
+    y[c] = mouseY;
+    r[c] = 0;
+    c++;
+    click = true;
+  }
+  else
+    c = 0;
 }
 
 
