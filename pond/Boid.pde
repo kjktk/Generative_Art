@@ -40,9 +40,30 @@ class Boid {
   }
   
   void pull(ArrayList<Boid> boids,float x,float y) {
-    PVector pull = new PVector(x,y);
-    pull.mult(2.0);
-    applyForce(pull);
+    PVector boid = (boids);
+    PVector mouse = new PVector(x,y);
+    
+    mouse.mult(10.0);
+    applyForce(mouse);
+  }
+  PVector pullMouse (ArrayList<Boid> boids) {
+    PVector sum = new PVector(0, 0);   // Start with empty vector to accumulate all locations
+    int count = 0;
+    for (Boid other : boids) {
+      sum.add(location); // Add location
+      count++;
+    }
+    if (count > 0) {
+      sum.div((float)count);
+      sum.normalize();
+      sum.mult(maxspeed);
+      PVector steer = PVector.sub(sum, velocity);
+      steer.limit(maxforce);
+      return steer;
+    }
+    else {
+      return new PVector(0, 0);
+    }
   }
 
   void applyForce(PVector force) {
