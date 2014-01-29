@@ -40,15 +40,13 @@ class Boid {
   }
   
   void pull(ArrayList<Boid> boids,float x,float y) {
-    PVector boid = new PVector(0,0);
+    PVector mouse = new PVector(x,y);
     for (Boid n : boids) {
-      boid.add(location); // Add location
-      PVector mouse = new PVector(x - boid.x,y - boid.y);
-      PVector steer = PVector.sub(mouse, velocity);
-      steer.mult(0.2);
+      PVector boid = new PVector(x - location.x, y - location.y);
+      PVector steer = PVector.sub(boid, velocity);
+      steer.mult(0.1);
       applyForce(steer);
     }
-   
   }
 
   void applyForce(PVector force) {

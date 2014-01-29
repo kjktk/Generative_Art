@@ -8,7 +8,7 @@ void setup() {
   size(1280, 720);
   flock = new Flock();
   // Add an initial set of boids into the system
-  for (int i = 0; i < 1; i++) {
+  for (int i = 0; i < 100; i++) {
     int flockType = Math.round(random(0,4));
     flock.addBoid(new Boid(width/2,height/2,flockType));
   }
