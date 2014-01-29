@@ -19,7 +19,7 @@ class Flock {
   
   void pull(float x,float y) {
     for (Boid b : boids) {
-      b.pull(boids,x,y);  
+      b.pull(boids,x,y); 
     }
   }
 

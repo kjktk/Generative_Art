@@ -27,7 +27,7 @@ class Boid {
     velocity = new PVector(cos(angle), sin(angle));
 
     location = new PVector(x, y);
-    r = 100.0;
+    r = 90.0;
     maxspeed = 4;
     maxforce = 0.03;
   }
@@ -40,30 +40,15 @@ class Boid {
   }
   
   void pull(ArrayList<Boid> boids,float x,float y) {
-    PVector boid = (boids);
-    PVector mouse = new PVector(x,y);
-    
-    mouse.mult(10.0);
-    applyForce(mouse);
-  }
-  PVector pullMouse (ArrayList<Boid> boids) {
-    PVector sum = new PVector(0, 0);   // Start with empty vector to accumulate all locations
-    int count = 0;
-    for (Boid other : boids) {
-      sum.add(location); // Add location
-      count++;
+    PVector boid = new PVector(0,0);
+    for (Boid n : boids) {
+      boid.add(location); // Add location
+      PVector mouse = new PVector(x - boid.x,y - boid.y);
+      PVector steer = PVector.sub(mouse, velocity);
+      steer.mult(0.2);
+      applyForce(steer);
     }
-    if (count > 0) {
-      sum.div((float)count);
-      sum.normalize();
-      sum.mult(maxspeed);
-      PVector steer = PVector.sub(sum, velocity);
-      steer.limit(maxforce);
-      return steer;
-    }
-    else {
-      return new PVector(0, 0);
-    }
+   
   }
 
   void applyForce(PVector force) {
@@ -119,20 +104,12 @@ class Boid {
     // Draw a triangle rotated in the direction of velocity
     float theta = velocity.heading2D() + radians(90);
     // heading2D() above is now heading() but leaving old syntax until Processing.js catches up
-    
-    fill(200, 100);
-    stroke(255);
+   
     pushMatrix();
     translate(location.x, location.y);
-
     rotate(theta);
     image(imgs[count/10 %imgs.length],0,0);
     count++;
-//    beginShape(TRIANGLES);
-//      vertex(0, -r*2);
-//      vertex(-r, r*2);
-//      vertex(r, r*2);
-//    endShape();
     popMatrix(); 
     
   }
