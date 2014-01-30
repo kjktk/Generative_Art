@@ -9,7 +9,7 @@ float[] r = new float[10];
 int c;
 
 void setup() {
-  //new FullScreen(this).enter();
+  new FullScreen(this).enter();
   size(1280, 720);
   colorMode(HSB,360,100, 100);
   noFill();
