@@ -1,4 +1,4 @@
-int RIPPLES = 10;
+int RIPPLES = 30;
 int FLOCKS = 50;
 
 Ripple[] ripples = new Ripple[RIPPLES];
@@ -40,7 +40,7 @@ void mousePressed() {
   for(int i = ripples.length - 1; i > 0; i--) {
     ripples[i] = new Ripple(ripples[i - 1]);
   }
-  ripples[0].init(mouseX,mouseY,random(5,15),int(random(10,80)));
+  ripples[0].init(mouseX,mouseY,random(5,15),int(random(180,220)));
 }
 
 

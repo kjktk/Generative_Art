@@ -1,5 +1,6 @@
 class Boid {
-  int count = 0;
+  int _count = 0;
+  float _scale = 1;
   PImage[] imgs = new PImage[4];
   String[] imgNames = new String[]{
      "carp1","carp","carp4","carp3","carp2"
@@ -14,7 +15,7 @@ class Boid {
   Boid(float x, float y, int type) {
     for (int i = 0; i < 4; i++) {
       imgs[i] = loadImage(imgNames[type]+"_"+i+".png");
-  }
+    }
     acceleration = new PVector(0, 0);
 
     // This is a new PVector method not yet implemented in JS
@@ -28,6 +29,7 @@ class Boid {
     r = 90.0;
     maxspeed = 4;
     maxforce = 0.03;
+    _scale = random(0.5,1);
   }
 
   void run(ArrayList<Boid> boids) {
@@ -106,8 +108,9 @@ class Boid {
     pushMatrix();
     translate(location.x, location.y);
     rotate(theta);
-    image(imgs[count/10 %imgs.length],0,0);
-    count++;
+    PImage img = imgs[_count/10 %imgs.length];
+    image(img,0,0,img.width*_scale,img.height*_scale);
+    _count++;
     popMatrix(); 
     
   }

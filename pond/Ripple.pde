@@ -30,17 +30,21 @@ public class Ripple{
     flag = true;
   }
   
-  //--波紋の描画
   public void rippleDraw(){
     noFill();
     
     if(speed > 1.0){
-      stroke(colorH, 40, 99, 100*(speed-1)/3);
+      stroke(colorH, 40, 95, 100*(speed-1)/3);
       strokeWeight(4);
       ellipse(x, y, dia, dia);
     }
     if(speed > 1.5){
-      stroke(colorH, 40, 99, 100*(speed-1.5)/3);
+      stroke(colorH, 40, 95, 100*(speed-1.5)/3);
+      strokeWeight(3);
+      ellipse(x, y, dia*0.7, dia*0.7);
+    }
+    if(speed > 2.0){
+      stroke(colorH, 40, 95, 100*(speed-2.0)/3);
       strokeWeight(1);
       ellipse(x, y, dia*0.7, dia*0.7);
     }
