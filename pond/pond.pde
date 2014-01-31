@@ -1,40 +1,47 @@
 import fullscreen.*;
-
+int RIPPLES = 10;
+int FLOCKS = 50;
+Ripple[] ripples = new Ripple[RIPPLES];
 Flock flock;
 
 void setup() {
   new FullScreen(this).enter();
   size(1280, 720);
-  colorMode(HSB,360,100, 100);
-  noFill();
-  strokeWeight(6);
+  colorMode(HSB,360,100,100);
   smooth();
   
   flock = new Flock();
   
-  // Add an initial set of boids into the system
-  for (int i = 0; i < 50; i++) {
+  for (int i = 0; i < FLOCKS; i++) {
     int flockType = Math.round(random(0,4));
     flock.addBoid(new Boid(random(width),random(height),flockType));
   }
+  
+  for(int i = 0;i < RIPPLES ; i++) {
+    ripples[i] = new Ripple();
+  }
+
 }
 
 void draw() {
   float max_size = width * height;
   background(0);
   flock.run();
-  if (click) {
-    for (int i = 0; i < c; i++){
-      r[i]+=10;
-      stroke(x[i] * y[i] /max_size * 360,40,90); 
-      ellipse(x[i],y[i],r[i],r[i]);
+  for (int i = 0; i < RIPPLES; i++) {
+    if ( ripples[i].getFlag()) {
+      ripples[i].move();
+      ripples[i].rippleDraw();
     }
   }
-  
 }
 
 void mousePressed() {
   flock.pull(mouseX,mouseY);
+  
+  for(int i = RIPPLES - 1; i > 0; i--) {
+    ripples[i] = new Ripple(ripples[i - 1]);
+  }
+  ripples[0].init(mouseX,mouseY,random(5,15),int(random(10,80)));
 }
 
 
