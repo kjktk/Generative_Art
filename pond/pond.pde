@@ -1,5 +1,5 @@
 int RIPPLES = 30;
-int FLOCKS = 50;
+int FLOCKS = 100;
 
 Ripple[] ripples = new Ripple[RIPPLES];
 Flock flock;

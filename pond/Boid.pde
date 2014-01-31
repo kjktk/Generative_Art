@@ -26,10 +26,10 @@ class Boid {
     velocity = new PVector(cos(angle), sin(angle));
 
     location = new PVector(x, y);
-    r = 90.0;
+    r = 50;
     maxspeed = 4;
     maxforce = 0.03;
-    _scale = random(0.5,1);
+    _scale = random(0.5,0.8);
   }
 
   void run(ArrayList<Boid> boids) {
@@ -46,6 +46,8 @@ class Boid {
       if (Math.abs(d) < 200) { 
         PVector boid = new PVector(x - location.x, y - location.y);
         PVector steer = PVector.sub(boid, velocity);
+        steer.normalize();
+        steer.mult(maxspeed);
         steer.mult(0.1);
         applyForce(steer);
       }
@@ -188,7 +190,7 @@ class Boid {
   }
 
   PVector cohesion (ArrayList<Boid> boids) {
-    float neighbordist = 50;
+    float neighbordist = 100;
     PVector sum = new PVector(0, 0);
     int count = 0;
     for (Boid other : boids) {
