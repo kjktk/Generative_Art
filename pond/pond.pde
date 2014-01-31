@@ -2,12 +2,6 @@ import fullscreen.*;
 
 Flock flock;
 
-boolean click = false;
-float[] x = new float[10];
-float[] y = new float[10];
-float[] r = new float[10];
-int c;
-
 void setup() {
   new FullScreen(this).enter();
   size(1280, 720);
@@ -41,17 +35,6 @@ void draw() {
 
 void mousePressed() {
   flock.pull(mouseX,mouseY);
-  
-  if(c < 10){
-    x[c] = mouseX;
-    y[c] = mouseY;
-    r[c] = 0;
-    c++;
-    click = true;
-  }
-  else {
-    c = 0;
-  }
 }
 
 
