@@ -32,7 +32,7 @@ void draw() {
   if (click) {
     for (int i = 0; i < c; i++){
       r[i]+=10;
-      stroke(x[i] * y[i] /max_size * 360,100,100); 
+      stroke(x[i] * y[i] /max_size * 360,40,90); 
       ellipse(x[i],y[i],r[i],r[i]);
     }
   }

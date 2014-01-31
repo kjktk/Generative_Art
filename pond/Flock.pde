@@ -1,5 +1,3 @@
-// The Flock (a list of Boid objects)
-
 class Flock {
   ArrayList<Boid> boids; // An ArrayList for all the boids
 
