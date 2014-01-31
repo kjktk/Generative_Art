@@ -44,12 +44,9 @@ class Boid {
     for (Boid n : boids) {
       float d = PVector.dist(location,mouse);
       if (Math.abs(d) < 200) { 
-        PVector boid = new PVector(x - location.x, y - location.y);
-        PVector steer = PVector.sub(boid, velocity);
-        steer.normalize();
-        steer.mult(maxspeed);
-        steer.mult(0.1);
-        applyForce(steer);
+          PVector steer = seek(mouse);
+          steer.mult(1.5);
+          applyForce(steer);
       }
     }
   }

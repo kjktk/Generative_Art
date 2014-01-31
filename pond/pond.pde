@@ -1,5 +1,7 @@
 int RIPPLES = 30;
 int FLOCKS = 100;
+int interval = 0;
+boolean mouseFlag = true;
 
 Ripple[] ripples = new Ripple[RIPPLES];
 Flock flock;
@@ -7,6 +9,7 @@ Flock flock;
 void setup() {
   size(displayWidth, displayHeight);
   colorMode(HSB,360,100,100);
+  frameRate(30);
   smooth();
   
   flock = new Flock();
@@ -23,7 +26,6 @@ void setup() {
 }
 
 void draw() {
-  float max_size = width * height;
   background(0);
   flock.run();
   for (int i = 0; i < ripples.length; i++) {
@@ -32,15 +34,23 @@ void draw() {
       ripples[i].rippleDraw();
     }
   }
+  if (interval > 30) {
+    mouseFlag = true;
+    interval = 0;
+  }
+  interval += 1;
 }
 
 void mousePressed() {
-  flock.pull(mouseX,mouseY);
-  
+  if( mouseFlag == true ) {
+    flock.pull(mouseX,mouseY);
+    mouseFlag = false;
+  }
   for(int i = ripples.length - 1; i > 0; i--) {
     ripples[i] = new Ripple(ripples[i - 1]);
   }
   ripples[0].init(mouseX,mouseY,random(5,15),int(random(180,220)));
+  
 }
 
 
