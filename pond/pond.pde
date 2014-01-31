@@ -1,12 +1,11 @@
-import fullscreen.*;
 int RIPPLES = 10;
 int FLOCKS = 50;
+
 Ripple[] ripples = new Ripple[RIPPLES];
 Flock flock;
 
 void setup() {
-  new FullScreen(this).enter();
-  size(1280, 720);
+  size(displayWidth, displayHeight);
   colorMode(HSB,360,100,100);
   smooth();
   
@@ -17,7 +16,7 @@ void setup() {
     flock.addBoid(new Boid(random(width),random(height),flockType));
   }
   
-  for(int i = 0;i < RIPPLES ; i++) {
+  for(int i = 0;i < ripples.length ; i++) {
     ripples[i] = new Ripple();
   }
 
@@ -27,7 +26,7 @@ void draw() {
   float max_size = width * height;
   background(0);
   flock.run();
-  for (int i = 0; i < RIPPLES; i++) {
+  for (int i = 0; i < ripples.length; i++) {
     if ( ripples[i].getFlag()) {
       ripples[i].move();
       ripples[i].rippleDraw();
@@ -38,7 +37,7 @@ void draw() {
 void mousePressed() {
   flock.pull(mouseX,mouseY);
   
-  for(int i = RIPPLES - 1; i > 0; i--) {
+  for(int i = ripples.length - 1; i > 0; i--) {
     ripples[i] = new Ripple(ripples[i - 1]);
   }
   ripples[0].init(mouseX,mouseY,random(5,15),int(random(10,80)));
