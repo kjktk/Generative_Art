@@ -11,6 +11,7 @@ void setup() {
   colorMode(HSB,360,100,100);
   frameRate(30);
   smooth();
+  //noCursor();
   
   flock = new Flock();
   
