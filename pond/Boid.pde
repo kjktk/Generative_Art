@@ -45,7 +45,7 @@ class Boid {
       float d = PVector.dist(location,mouse);
       if (Math.abs(d) < 200) { 
           PVector steer = seek(mouse);
-          steer.mult(1.5);
+          steer.mult(0.8);
           applyForce(steer);
       }
     }
