@@ -108,6 +108,7 @@ class Boid {
     translate(location.x, location.y);
     rotate(theta);
     PImage img = imgs[_count/10 %imgs.length];
+    tint(0,0,100,random(180,200));
     image(img,0,0,img.width*_scale,img.height*_scale);
     _count++;
     popMatrix(); 

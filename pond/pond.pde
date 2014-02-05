@@ -9,9 +9,10 @@ Flock flock;
 void setup() {
   size(displayWidth, displayHeight);
   colorMode(HSB,360,100,100);
-  frameRate(30);
+  frameRate(15);
   smooth();
   //noCursor();
+  
   
   flock = new Flock();
   
@@ -27,7 +28,8 @@ void setup() {
 }
 
 void draw() {
-  background(0);
+  background(200,100,70);
+  
   flock.run();
   for (int i = 0; i < ripples.length; i++) {
     if ( ripples[i].getFlag()) {
