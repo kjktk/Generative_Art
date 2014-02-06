@@ -35,7 +35,7 @@ void setup() {
 }
 
 void draw() {
-  background(200,70,70);
+  background(200,100,100);
   flock.run();
   for (int i = 0; i < ripples.length; i++) {
     if ( ripples[i].getFlag()) {
@@ -51,19 +51,16 @@ void draw() {
   updatePixels();
   
   mask.beginDraw();
-    mask.smooth();
     mask.background(0);
     mask.noStroke();
-    for (int w = mask.height; w > 0; w -= 30) {
-      mask.fill(255 - w * 255 / mask.height);
+    for (int w = mask.height+10; w > 0; w -= 1) {
+      mask.fill(255 - w * 255 / mask.height+10);
       mask.ellipse(mask.width / 2, mask.height / 2, w, w);
     }
   mask.endDraw();
   
   pg.beginDraw();
     pg.smooth();
-    pg.background(0,150,255);
-    //pg.fill(pixelBuffer);
     pg.loadPixels();
     for (int i = 0; i < width * height; i++) {
         pg.pixels[i] = pixelBuffer[i];
