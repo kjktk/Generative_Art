@@ -34,17 +34,17 @@ public class Ripple{
     noFill();
     
     if(speed > 1.0){
-      stroke(colorH, 40, 100, 100*(speed-1)/3);
+      stroke(colorH, 90, 95, 100*(speed-1)/3);
       strokeWeight(2);
       ellipse(x, y, dia, dia);
     }
     if(speed > 1.5){
-      stroke(colorH, 40, 95, 100*(speed-1.5)/3);
+      stroke(colorH, 90, 95, 100*(speed-1.5)/3);
       strokeWeight(5);
       ellipse(x, y, dia*0.7, dia*0.7);
     }
     if(speed > 2.0){
-      stroke(colorH, 40, 95, 100*(speed-2.0)/3);
+      stroke(colorH, 90, 95, 100*(speed-2.0)/3);
       strokeWeight(7);
       ellipse(x, y, dia*0.7, dia*0.7);
     }
