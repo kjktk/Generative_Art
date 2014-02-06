@@ -5,6 +5,8 @@ int mouseMode = 0;
 color[] pixelBuffer;
 PGraphics pg;
 PGraphics mask;
+int selected = -1;
+int pos[][];
 
 Ripple[] ripples = new Ripple[RIPPLES];
 Flock flock;
@@ -80,7 +82,33 @@ void mousePressed() {
     }
     ripples[0].init(mouseX,mouseY,random(5,20),int(random(180,200)));
   } else if ( mouseMode == 1) {
-    
+    if ( mousePressed && selected >= 0 ) {
+       pos[selected][0] = mouseX;
+       pos[selected][1] = mouseY;
+    }
+    else {
+      float min_d = 20;
+      selected = -1;
+      for (int i=0; i<4; i++) {
+        float d = dist( mouseX, mouseY, pos[i][0], pos[i][1] );
+        if ( d < min_d ) {
+          min_d = d;
+          selected = i;
+        }      
+      }
+    }
+    if ( selected >= 0 ) {
+      ellipse( mouseX, mouseY, 20, 20 );
+    }
   }
 }
 
+void keyPressed() {
+  if (key == ENTER) {
+    if (mouseMode == 0) {
+      mouseMode = 1;
+    } else if (mouseMode == 1) {
+      mouseMode = 0;
+    }
+  }
+}
