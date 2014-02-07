@@ -5,8 +5,9 @@ int mouseMode = 0;
 color[] pixelBuffer;
 PGraphics pg;
 PGraphics mask;
-int selected = -1;
-int pos[][];
+int   selected = -1;  // 選択されている頂点
+int   pos[][] = {{0,0},{400,0},{400,300},{0,300}}; // 頂点座標
+
 
 Ripple[] ripples = new Ripple[RIPPLES];
 Flock flock;
@@ -83,11 +84,10 @@ void mousePressed() {
     ripples[0].init(mouseX,mouseY,random(5,20),int(random(180,200)));
   } else if ( mouseMode == 1) {
     if ( mousePressed && selected >= 0 ) {
-       pos[selected][0] = mouseX;
-       pos[selected][1] = mouseY;
+
     }
     else {
-      float min_d = 20;
+      float min_d = 20; // この値が頂点への吸着の度合いを決める
       selected = -1;
       for (int i=0; i<4; i++) {
         float d = dist( mouseX, mouseY, pos[i][0], pos[i][1] );
