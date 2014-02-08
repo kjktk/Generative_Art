@@ -28,8 +28,8 @@ class Boid {
     location = new PVector(x, y);
     r = 50;
     maxspeed = 4;
-    maxforce = 0.03;
-    _scale = random(0.5,0.8);
+    maxforce = 0.05;
+    _scale = random(0.5,1.7);
   }
 
   void run(ArrayList<Boid> boids) {
@@ -61,7 +61,7 @@ class Boid {
     PVector ali = align(boids);      // Alignment
     PVector coh = cohesion(boids);   // Cohesion
     // Arbitrarily weight these forces
-    sep.mult(2.0);
+    sep.mult(1.5);
     ali.mult(1.0);
     coh.mult(1.0);
     
@@ -108,7 +108,7 @@ class Boid {
     translate(location.x, location.y);
     rotate(theta);
     PImage img = imgs[_count/10 %imgs.length];
-    tint(0,0,100,random(180,200));
+    tint(0,0,100,random(150,200));
     image(img,0,0,img.width*_scale,img.height*_scale);
     _count++;
     popMatrix(); 
