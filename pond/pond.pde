@@ -10,7 +10,7 @@ Flock flock;
 void setup() {
   size(displayWidth, displayHeight);
   colorMode(HSB,360,100,100);
-  frameRate(60);
+  frameRate(30);
   smooth();
   //noCursor();
   
@@ -27,14 +27,9 @@ void setup() {
 
 void draw() {
   fill(0,50);
-  rect(-20, -20, width+40, height+40);
+  drawGrid();
+  rect(-20, -20, width+40, height+40); //fixed
   flock.run();
-//  for (int i = 0; i < ripples.length; i++) {
-//    if ( ripples[i].getFlag()) {
-//      ripples[i].move();
-//      ripples[i].rippleDraw();
-//    }
-//  }
   
 }
 
@@ -62,3 +57,16 @@ void keyPressed() {
     }
   }
 }
+
+void drawGrid() {
+  int gridSize = 10;
+  stroke(127, 127);
+  strokeWeight(1);
+  for (int x = 0; x < width; x+=gridSize) {
+    line(x, 0, x, height);
+  }
+  for (int y = 0; y < height; y+=gridSize) {
+    line(0, y, width, y);
+  }
+}
+

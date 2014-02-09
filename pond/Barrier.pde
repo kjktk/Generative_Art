@@ -13,7 +13,6 @@ class Barrier {
     push();
   }
   void render() {
-
     noStroke();
     fill(255,0,255,10);
     ellipse(location.x,location.y,pushLength,pushLength);
