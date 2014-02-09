@@ -31,7 +31,7 @@ class Boid {
     maxforce = 0.05;
     _scale = random(0.5,1.7);
   }
-
+  
   void run(ArrayList<Boid> boids) {
     flock(boids);
     update();
@@ -49,6 +49,9 @@ class Boid {
           applyForce(steer);
       }
     }
+  }
+ void push(ArrayList<Boid> boids) {
+    
   }
 
   void applyForce(PVector force) {

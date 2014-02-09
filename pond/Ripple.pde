@@ -5,23 +5,9 @@ public class Ripple{
   float dia;    //波紋の直径
   float speed;
   int colorH;   
-  boolean flag;
+  boolean flag = false;
   
-  Ripple(){
-    init(0, 0, 0, 0);
-    flag = false;
-  }
-
-  public Ripple(Ripple src){
-    this.x = src.x;
-    this.y = src.y;
-    this.speed = src.speed;
-    this.colorH = src.colorH;
-    this.dia = src.dia;
-    this.flag = src.flag;
-  }
-  
-  public void init(int _x, int _y, float _speed, int _colorH){
+  Ripple(int _x,int _y, float _speed, int _colorH){
     x = _x;
     y = _y;
     speed = _speed;
@@ -30,7 +16,14 @@ public class Ripple{
     flag = true;
   }
   
-  public void rippleDraw(){
+  void run(ArrayList<Ripple> ripples) {
+    if (flag == true) {
+      rippleDraw();
+      move();
+    }
+  }
+  
+  void rippleDraw(){
     noFill();
     
     if(speed > 1.0){
@@ -50,16 +43,12 @@ public class Ripple{
     }
   }
   
-  public void move(){
+  void move(){
     dia += speed;      //直径を速度分大きく
     speed *= FRICTION; //速度減衰
     if(speed < 1.0){   //速度が1.0以下になったら描画しない設定
       flag = false;
     }
-  }
-  
-  public boolean getFlag(){
-    return flag;
   }
 }
 
