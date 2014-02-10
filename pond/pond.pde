@@ -1,5 +1,5 @@
 import processing.opengl.*;
-
+import fullscreen.*;
 int numRipples = 1;
 int numFlocks = 50;
 int numBarriers = 5;
@@ -8,15 +8,18 @@ int mouseMode = 0;
 color[] pixelBuffer;
 PGraphics pg;
 PImage img;
+PImage mask;
 
 Flock flock;
 void setup() {
-  size(displayWidth, displayHeight);
+  //new FullScreen(this).enter();
+  size(1280,720);
   colorMode(HSB,360,100,100);
   frameRate(30);
   smooth();
   //noCursor();
   
+  mask = loadImage("mask.png");
   flock = new Flock();
   
   for (int i = 0; i < numFlocks; i++) {
@@ -33,7 +36,7 @@ void draw() {
   drawGrid();
   rect(-20, -20, width+40, height+40); //fixed
   flock.run();
-  
+  //image(mask,0,0);
 }
 
 void mousePressed() {
@@ -46,7 +49,7 @@ void mousePressed() {
   else if ( mouseMode == 1 ) {
     
     for (int i = 0; i < numBarriers; i++) {
-      flock.addBarrier(new Barrier(mouseX,mouseY,20));
+      flock.addBarrier(new Barrier(mouseX,mouseY,random(90)));
     }
   }
 }
@@ -76,6 +79,7 @@ PImage renderImage() {
   fill(0,50);
   rect(-20, -20, width+40, height+40); //fixed
   flock.run();
+  
   loadPixels();
   arrayCopy(pixels,pixelBuffer);
   for (int i = 0; i < width * height; i++) {

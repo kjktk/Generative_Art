@@ -12,6 +12,7 @@ class Flock {
   void run() {
     for (Boid b : boids) {
       b.run(boids);
+      b.push(boids,barriers);
     }
     for (Ripple r : ripples) {
       r.run(ripples);
@@ -37,8 +38,8 @@ class Flock {
       b.pull(boids,x,y); 
     }
   }
-  void push(Boid b) {
-    //boids.push(b);
+  void push() {
+
   }
   
 }
