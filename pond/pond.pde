@@ -95,6 +95,8 @@ void drawGrid() {
     line(0, y, width, y);
   }
 }
+
+
 PImage renderImage() {
   fill(0,50);
   rect(-20, -20, width+40, height+40); //fixed

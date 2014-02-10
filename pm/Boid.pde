@@ -11,7 +11,8 @@ class Boid {
   float r;
   float maxforce;    // Maximum steering force
   float maxspeed;    // Maximum speed
-
+    
+  
   Boid(float x, float y, int type) {
     for (int i = 0; i < 4; i++) {
       imgs[i] = loadImage(imgNames[type]+"_"+i+".png");
@@ -45,13 +46,44 @@ class Boid {
       float d = PVector.dist(location,mouse);
       if (Math.abs(d) < 200) { 
           PVector steer = seek(mouse);
+          steer.mult(0.3);
+          applyForce(steer);
+      }
+      if (Math.abs(d) < 100) { 
+          PVector steer = seek(mouse);
           steer.mult(0.8);
           applyForce(steer);
       }
     }
   }
- void push(ArrayList<Boid> boids) {
-    
+  
+ void push(ArrayList<Boid> boids,ArrayList<Barrier> barriers) {
+   PVector sum = new PVector(0, 0);
+   for (Boid n : boids) {
+     for (Barrier barrier : barriers) {
+       float d = PVector.dist(location, barrier.location);
+       if (Math.abs(d) < barrier.diameter*3) {
+         PVector steer = seek(barrier.location);
+         steer.mult(-0.05);
+         applyForce(steer);
+       }
+       else if (Math.abs(d) < barrier.diameter*2) {
+         PVector steer = seek(barrier.location);
+         steer.mult(-0.3);
+         applyForce(steer);
+       }
+       else if (Math.abs(d) < barrier.diameter*1.5) {
+         PVector steer = seek(barrier.location);
+         steer.mult(-0.9);
+         applyForce(steer);
+       }
+       else if (Math.abs(d) < barrier.diameter) {
+         PVector steer = seek(barrier.location);
+         steer.mult(-3.0);
+         applyForce(steer);
+       }
+     }
+   }
   }
 
   void applyForce(PVector force) {
