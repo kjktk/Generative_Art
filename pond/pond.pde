@@ -69,6 +69,8 @@ void keyPressed() {
       mouseMode = "LOTUS";
   } else if (key == '5') {
       mouseMode = "AJUST";
+  } else if (key == '6') {
+      mouseMode = "MASK";
   }
   if (key == ENTER) {
     if (debug == true) {
