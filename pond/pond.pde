@@ -1,10 +1,13 @@
 import processing.opengl.*;
+import controlP5.*;
 import fullscreen.*;
+
 int numRipples = 1;
 int numFlocks = 50;
 int numBarriers = 5;
 int interval = 0;
-int mouseMode = 0;
+String mouseMode = "PLAY";
+Boolean debug = false;
 color[] pixelBuffer;
 PGraphics pg;
 PImage img;
@@ -40,28 +43,43 @@ void draw() {
 }
 
 void mousePressed() {
-  if( mouseMode == 0 ) {
+  if( mouseMode == "PLAY" ) {
     flock.pull(mouseX,mouseY);
     for(int i = 0;i < numRipples ; i++) {
       flock.addRipple(new Ripple(mouseX,mouseY,random(5,20),int(random(180,200))));
     }
   }
-  else if ( mouseMode == 1 ) {
-    
-    for (int i = 0; i < numBarriers; i++) {
-      flock.addBarrier(new Barrier(mouseX,mouseY,random(90)));
-    }
+  else if ( mouseMode == "ADD" ) {
+    int flockType = Math.round(random(0,4));
+    flock.addBoid(new Boid(mouseX,mouseY,flockType));
+  }
+  else if ( mouseMode == "BARRIER" ) {
+    flock.addBarrier(new Barrier(mouseX,mouseY,random(90)));
   }
 }
 
 void keyPressed() {
+  if (key == '1') {
+      mouseMode = "PLAY";
+  } else if (key == '2') {
+      mouseMode = "ADD";
+  } else if (key == '3') {
+      mouseMode = "BARRIER";
+  } else if (key == '4') {
+      mouseMode = "LOTUS";
+  } else if (key == '5') {
+      mouseMode = "AJUST";
+  }
   if (key == ENTER) {
-    if (mouseMode == 0) {
-      mouseMode = 1;
-    } else if (mouseMode == 1) {
-      mouseMode = 0;
+    if (debug == true) {
+      debug = false;
+    } else {
+      debug = true;
     }
   }
+}
+void debugMode() {
+ 
 }
 
 void drawGrid() {
