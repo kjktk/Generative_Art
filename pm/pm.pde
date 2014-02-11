@@ -3,6 +3,7 @@ import controlP5.*;
 import fullscreen.*;
 import mappingtools.*;
 import ddf.minim.*;
+import ddf.minim.analysis.*;
 
 int numRipples = 1;
 int numFlocks = 50;
@@ -16,10 +17,15 @@ PGraphics pg;
 PGraphics mask;
 PImage img;
 
-BezierWarp bw;
-Flock flock;
-Minim minim;
-AudioPlayer player; 
+int ys = 25;
+int yi = 15;
+
+BezierWarp    bw;
+Flock         flock;
+Minim         minim;
+AudioPlayer   player;
+AudioMetaData meta;
+FFT           fft;
 
 void setup() {
   //new FullScreen(this).enter();
@@ -33,10 +39,14 @@ void setup() {
   mask = createGraphics(width,height,OPENGL);
   
   bw = new BezierWarp(this, 10);
+  
   flock = new Flock();
+  
   minim = new Minim(this);
-  player = minim.loadFile("Go Cart - Loop Mix.mp3");
-  player.play(); 
+  player = minim.loadFile("Go Cart - Loop Mix.mp3",1024);
+  meta = player.getMetaData();
+  
+  
   for (int i = 0; i < numFlocks; i++) {
     int flockType = Math.round(random(0,4));
     flock.addBoid(new Boid(random(width),random(height),flockType));
@@ -56,27 +66,34 @@ void setup() {
     mask.ellipse(mask.width / 2, mask.height / 2, w, w);
   }
   mask.endDraw();
-
+  
+  player.loop(); 
+  fft = new FFT( player.bufferSize(), player.sampleRate() );
+  
+  textFont(createFont("Serif", 12));
 }
 
 void draw() {
   background(0);
   
-  
-  
   pg.beginDraw();
   pg.smooth();
   pg.fill(0,50);
   pg.rect(-20, -20, width+40, height+40); //fixed
+  drawFFT();
   flock.run(pg);
   pg.endDraw();
   
-  pg.mask(mask);
-  
-  if ( mode == "PLAY" || mode == "AJUST") {
-    bw.render(pg);
-  } else {
+  if ( mode == "MASK" ) {
+    pg.mask(mask);
+  }
+
+  if ( debug == true ) {
+    drawGrid();
+    drawMeta();
     image(pg,0,0);
+  } else {
+    bw.render(pg);
   }
 }
 
@@ -97,7 +114,7 @@ void mousePressed() {
 }
 
 void stop() {
-    player.close();  //サウンドデータを終了
+  player.close();  //サウンドデータを終了
   minim.stop();
   super.stop();
 }
@@ -137,4 +154,32 @@ void drawGrid() {
   for (int y = 0; y < height; y+=gridSize) {
     line(0, y, width, y);
   }
+}
+
+void drawFFT() {
+  pg.stroke(255);
+  fft.forward( player.mix );
+  for(int i = 0; i < fft.specSize(); i++)
+  {
+    pg.line( i, height, i, height - fft.getBand(i)*8 );
+  }
+}
+
+void drawMeta() {
+  int y = ys;
+  text("File Name: " + meta.fileName(), 5, y);
+  text("Length (in milliseconds): " + meta.length(), 5, y+=yi);
+  text("Title: " + meta.title(), 5, y+=yi);
+  text("Author: " + meta.author(), 5, y+=yi); 
+  text("Album: " + meta.album(), 5, y+=yi);
+  text("Date: " + meta.date(), 5, y+=yi);
+  text("Comment: " + meta.comment(), 5, y+=yi);
+  text("Track: " + meta.track(), 5, y+=yi);
+  text("Genre: " + meta.genre(), 5, y+=yi);
+  text("Copyright: " + meta.copyright(), 5, y+=yi);
+  text("Disc: " + meta.disc(), 5, y+=yi);
+  text("Composer: " + meta.composer(), 5, y+=yi);
+  text("Orchestra: " + meta.orchestra(), 5, y+=yi);
+  text("Publisher: " + meta.publisher(), 5, y+=yi);
+  text("Encoded: " + meta.encoded(), 5, y+=yi);
 }
