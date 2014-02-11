@@ -27,19 +27,19 @@ public class Ripple{
     render.noFill();
     render.colorMode(HSB,360,100,100);
     if(speed > 1.0){
-      render.stroke(colorH, 90, 95, 100*(speed-1)/3);
-      render.strokeWeight(2);
+      render.stroke(colorH, 100, 100, 100*(speed-1)/3);
+      render.strokeWeight(3);
       render.ellipse(x, y, dia, dia);
     }
     if(speed > 1.5){
-      render.stroke(colorH, 90, 95, 100*(speed-1.5)/3);
-      render.strokeWeight(5);
+      render.stroke(colorH, 100, 100, 100*(speed-1.5)/3);
+      render.strokeWeight(7);
       render.ellipse(x, y, dia*0.7, dia*0.7);
     }
     if(speed > 2.0){
-      render.stroke(colorH, 90, 95, 100*(speed-2.0)/3);
-      render.strokeWeight(7);
-      render.ellipse(x, y, dia*0.7, dia*0.7);
+      render.stroke(colorH, 100, 100, 100*(speed-2.0)/3);
+      render.strokeWeight(10);
+      render.ellipse(x, y, dia*0.5, dia*0.5);
     }
   }
   

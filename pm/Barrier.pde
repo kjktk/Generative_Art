@@ -13,7 +13,7 @@ class Barrier {
 //    noStroke();
 //    fill(255,0,255,10);
 //    ellipse(location.x,location.y,pushLength,diameter*3);
-    render.fill(0,0,0,100);
+    render.fill(0,0,0,255);
     render.stroke(255,0,255,100);
     render.ellipse(location.x,location.y,diameter,diameter);
   }

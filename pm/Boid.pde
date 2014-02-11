@@ -143,8 +143,7 @@ class Boid {
     render.translate(location.x, location.y);
     render.rotate(theta);
     PImage img = imgs[_count/10 %imgs.length];
-    render.colorMode(RGB);
-    render.tint(255,255,255,random(100,200));
+    render.tint(0,0,random(90,100));
     render.image(img,0,0,img.width*_scale,img.height*_scale);
     _count++;
     render.popMatrix(); 
