@@ -9,16 +9,16 @@ class Flock {
     barriers = new ArrayList<Barrier>();
   }
 
-  void run() {
+  void run(PGraphics render) {
     for (Boid b : boids) {
-      b.run(boids);
+      b.run(boids,render);
       b.push(boids,barriers);
     }
     for (Ripple r : ripples) {
-      r.run(ripples);
+      r.run(ripples,render);
     }
     for (Barrier b : barriers) {
-      b.run(barriers);
+      b.run(barriers,render);
     }
   }
 

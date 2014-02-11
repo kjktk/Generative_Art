@@ -16,30 +16,30 @@ public class Ripple{
     flag = true;
   }
   
-  void run(ArrayList<Ripple> ripples) {
+  void run(ArrayList<Ripple> ripples, PGraphics render) {
     if (flag == true) {
-      rippleDraw();
+      rippleDraw(render);
       move();
     }
   }
   
-  void rippleDraw(){
-    noFill();
-    
+  void rippleDraw(PGraphics render){
+    render.noFill();
+    render.colorMode(HSB,360,100,100);
     if(speed > 1.0){
-      stroke(colorH, 90, 95, 100*(speed-1)/3);
-      strokeWeight(2);
-      ellipse(x, y, dia, dia);
+      render.stroke(colorH, 90, 95, 100*(speed-1)/3);
+      render.strokeWeight(2);
+      render.ellipse(x, y, dia, dia);
     }
     if(speed > 1.5){
-      stroke(colorH, 90, 95, 100*(speed-1.5)/3);
-      strokeWeight(5);
-      ellipse(x, y, dia*0.7, dia*0.7);
+      render.stroke(colorH, 90, 95, 100*(speed-1.5)/3);
+      render.strokeWeight(5);
+      render.ellipse(x, y, dia*0.7, dia*0.7);
     }
     if(speed > 2.0){
-      stroke(colorH, 90, 95, 100*(speed-2.0)/3);
-      strokeWeight(7);
-      ellipse(x, y, dia*0.7, dia*0.7);
+      render.stroke(colorH, 90, 95, 100*(speed-2.0)/3);
+      render.strokeWeight(7);
+      render.ellipse(x, y, dia*0.7, dia*0.7);
     }
   }
   

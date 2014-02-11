@@ -24,7 +24,6 @@ void setup() {
   //noCursor();
   
   pg = createGraphics(width,height);
-  
   flock = new Flock();
   
   for (int i = 0; i < numFlocks; i++) {
@@ -34,13 +33,21 @@ void setup() {
   
 
   background(0);
+  
+  pg.beginDraw();
+  pg.colorMode(HSB,360,100,100);
+  pg.background(0);
+  pg.endDraw();
 }
 
 void draw() {
-  fill(0,50);
-  drawGrid();
-  rect(-20, -20, width+40, height+40); //fixed
-  flock.run();
+  pg.beginDraw();
+  pg.smooth();
+  pg.fill(0,50);
+  pg.rect(-20, -20, width+40, height+40); //fixed
+  flock.run(pg);
+  pg.endDraw();
+  image(pg,0,0);
 }
 
 void mousePressed() {
@@ -70,6 +77,7 @@ void keyPressed() {
       mouseMode = "LOTUS";
   } else if (key == '5') {
       mouseMode = "AJUST";
+      drawGrid();
   } else if (key == '6') {
       mouseMode = "MASK";
   }
@@ -101,7 +109,7 @@ void drawGrid() {
 PImage renderImage() {
   fill(0,50);
   rect(-20, -20, width+40, height+40); //fixed
-  flock.run();
+  //flock.run();
   
   loadPixels();
   arrayCopy(pixels,pixelBuffer);

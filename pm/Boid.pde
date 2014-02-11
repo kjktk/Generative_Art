@@ -33,11 +33,11 @@ class Boid {
     _scale = random(0.5,1.7);
   }
   
-  void run(ArrayList<Boid> boids) {
+  void run(ArrayList<Boid> boids,PGraphics render) {
     flock(boids);
     update();
     borders();
-    render();
+    render(render);
   }
   
   void pull(ArrayList<Boid> boids,float x,float y) {
@@ -134,19 +134,20 @@ class Boid {
     return steer;
   }
 
-  void render() {
+  void render(PGraphics render) {
     // Draw a triangle rotated in the direction of velocity
     float theta = velocity.heading2D() + radians(90);
     // heading2D() above is now heading() but leaving old syntax until Processing.js catches up
    
-    pushMatrix();
-    translate(location.x, location.y);
-    rotate(theta);
+    render.pushMatrix();
+    render.translate(location.x, location.y);
+    render.rotate(theta);
     PImage img = imgs[_count/10 %imgs.length];
-    tint(0,0,100,random(150,200));
-    image(img,0,0,img.width*_scale,img.height*_scale);
+    render.colorMode(RGB);
+    render.tint(255,255,255,random(100,200));
+    render.image(img,0,0,img.width*_scale,img.height*_scale);
     _count++;
-    popMatrix(); 
+    render.popMatrix(); 
     
   }
 
