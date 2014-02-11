@@ -5,9 +5,10 @@ import fullscreen.*;
 int numRipples = 1;
 int numFlocks = 50;
 int numBarriers = 5;
-int interval = 0;
+
 String mouseMode = "PLAY";
 Boolean debug = false;
+
 color[] pixelBuffer;
 PGraphics pg;
 PImage img;
@@ -22,7 +23,8 @@ void setup() {
   smooth();
   //noCursor();
   
-  mask = loadImage("mask.png");
+  pg = createGraphics(width,height);
+  
   flock = new Flock();
   
   for (int i = 0; i < numFlocks; i++) {
@@ -39,7 +41,6 @@ void draw() {
   drawGrid();
   rect(-20, -20, width+40, height+40); //fixed
   flock.run();
-  //image(mask,0,0);
 }
 
 void mousePressed() {
