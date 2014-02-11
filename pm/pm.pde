@@ -2,6 +2,7 @@ import processing.opengl.*;
 import controlP5.*;
 import fullscreen.*;
 import mappingtools.*;
+import ddf.minim.*;
 
 int numRipples = 1;
 int numFlocks = 50;
@@ -15,10 +16,11 @@ PGraphics pg;
 PGraphics mask;
 PImage img;
 
-
 BezierWarp bw;
-
 Flock flock;
+Minim minim;
+AudioPlayer player; 
+
 void setup() {
   //new FullScreen(this).enter();
   size(1280,720,OPENGL);
@@ -29,16 +31,16 @@ void setup() {
   
   pg = createGraphics(width,height,OPENGL);
   mask = createGraphics(width,height,OPENGL);
+  
   bw = new BezierWarp(this, 10);
   flock = new Flock();
-  
+  minim = new Minim(this);
+  player = minim.loadFile("Go Cart - Loop Mix.mp3");
+  player.play(); 
   for (int i = 0; i < numFlocks; i++) {
     int flockType = Math.round(random(0,4));
     flock.addBoid(new Boid(random(width),random(height),flockType));
   }
-  
-
-  
   
   pg.beginDraw();
   pg.colorMode(HSB,360,100,100);
@@ -71,9 +73,8 @@ void draw() {
   
   pg.mask(mask);
   
-  if ( mode == "AJUST") {
+  if ( mode == "PLAY" || mode == "AJUST") {
     bw.render(pg);
-    drawGrid();
   } else {
     image(pg,0,0);
   }
@@ -93,6 +94,12 @@ void mousePressed() {
   else if ( mode == "BARRIER" ) {
     flock.addBarrier(new Barrier(mouseX,mouseY,70));
   }
+}
+
+void stop() {
+    player.close();  //サウンドデータを終了
+  minim.stop();
+  super.stop();
 }
 
 void keyPressed() {
