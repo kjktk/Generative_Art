@@ -11,6 +11,8 @@ int numBarriers = 5;
 
 String mode = "PLAY";
 Boolean debug = false;
+Boolean maskFlag = false;
+Boolean gridFlag = false;
 
 color[] pixelBuffer;
 PGraphics pg;
@@ -21,6 +23,7 @@ int ys = 25;
 int yi = 15;
 
 BezierWarp    bw;
+QuadWarp      qw;
 Flock         flock;
 Minim         minim;
 AudioPlayer   player;
@@ -39,6 +42,7 @@ void setup() {
   mask = createGraphics(width,height,OPENGL);
   
   bw = new BezierWarp(this, 10);
+  qw = new QuadWarp(this, 10);
   
   flock = new Flock();
   
@@ -54,7 +58,6 @@ void setup() {
   
   pg.beginDraw();
   pg.colorMode(HSB,360,100,100);
-  pg.background(0);
   pg.endDraw();
   
   mask.beginDraw();
@@ -80,20 +83,21 @@ void draw() {
   pg.smooth();
   pg.fill(0,50);
   pg.rect(-20, -20, width+40, height+40); //fixed
-  drawFFT();
+  //drawFFT();
   flock.run(pg);
   pg.endDraw();
   
-  if ( mode == "MASK" ) {
+  if ( maskFlag == true ) {
     pg.mask(mask);
   }
-
-  if ( debug == true ) {
+  if (gridFlag == true) {
     drawGrid();
+  }
+  if ( debug == true ) {
     drawMeta();
     image(pg,0,0);
   } else {
-    bw.render(pg);
+    qw.render(img);
   }
 }
 
@@ -131,7 +135,22 @@ void keyPressed() {
   } else if (key == '5') {
       mode = "AJUST";
   } else if (key == '6') {
-      mode = "MASK";
+    if (maskFlag == false) {
+      maskFlag = true;
+    } else {
+      maskFlag = false;
+    }
+      
+  } 
+  if (key == '7') {
+      save("projection.jpg");
+  }
+  if (key == '8') {
+    if (gridFlag == true) {
+      gridFlag = false;
+    } else {
+      gridFlag = true;
+    }
   }
   if (key == ENTER) {
     if (debug == true) {

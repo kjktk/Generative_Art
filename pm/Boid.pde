@@ -19,9 +19,6 @@ class Boid {
     }
     acceleration = new PVector(0, 0);
 
-    // This is a new PVector method not yet implemented in JS
-    // velocity = PVector.random2D();
-
     // Leaving the code temporarily this way so that this example runs in JS
     float angle = random(TWO_PI);
     velocity = new PVector(cos(angle), sin(angle));
@@ -92,10 +89,10 @@ class Boid {
   }
 
   void flock(ArrayList<Boid> boids) {
-    PVector sep = separate(boids);   // Separation
-    PVector ali = align(boids);      // Alignment
-    PVector coh = cohesion(boids);   // Cohesion
-    // Arbitrarily weight these forces
+    PVector sep = separate(boids); 
+    PVector ali = align(boids);      
+    PVector coh = cohesion(boids);   
+    
     sep.mult(1.5);
     ali.mult(1.0);
     coh.mult(1.0);
@@ -105,37 +102,28 @@ class Boid {
     applyForce(coh);
   }
 
-  // Method to update location
   void update() {
-    // Update velocity
     velocity.add(acceleration);
-    // Limit speed
     velocity.limit(maxspeed);
     location.add(velocity);
-    // Reset accelertion to 0 each cycle
     acceleration.mult(0);
   }
 
-  // A method that calculates and applies a steering force towards a target
-  // STEER = DESIRED MINUS VELOCITY
+
   PVector seek(PVector target) {
-    PVector desired = PVector.sub(target, location);  // A vector pointing from the location to the target
-    // Scale to maximum speed
+    PVector desired = PVector.sub(target, location);
     desired.normalize();
     desired.mult(maxspeed);
 
     // Above two lines of code below could be condensed with new PVector setMag() method
     // Not using this method until Processing.js catches up
     // desired.setMag(maxspeed);
-
-    // Steering = Desired minus Velocity
     PVector steer = PVector.sub(desired, velocity);
     steer.limit(maxforce);  // Limit to maximum steering force
     return steer;
   }
 
   void render(PGraphics render) {
-    // Draw a triangle rotated in the direction of velocity
     float theta = velocity.heading2D() + radians(90);
     // heading2D() above is now heading() but leaving old syntax until Processing.js catches up
    
