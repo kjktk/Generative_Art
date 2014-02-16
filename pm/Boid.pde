@@ -135,7 +135,6 @@ class Boid {
     render.image(img,0,0,img.width*_scale,img.height*_scale);
     _count++;
     render.popMatrix(); 
-    
   }
 
   void borders() {

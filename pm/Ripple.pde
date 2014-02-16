@@ -1,13 +1,14 @@
 float FRICTION = 0.985; //波紋の減衰率
 
 public class Ripple{
-  int x, y;     //波紋の中心座標
+  float x, y;     //波紋の中心座標
   float dia;    //波紋の直径
   float speed;
   int colorH;   
   boolean flag = false;
   
-  Ripple(int _x,int _y, float _speed, int _colorH){
+  
+  Ripple(float _x,float _y, float _speed, int _colorH){
     x = _x;
     y = _y;
     speed = _speed;
@@ -24,23 +25,23 @@ public class Ripple{
   }
   
   void rippleDraw(PGraphics render){
-    render.noFill();
-    render.colorMode(HSB,360,100,100);
-    if(speed > 1.0){
-      render.stroke(colorH, 100, 100, 100*(speed-1)/3);
-      render.strokeWeight(3);
-      render.ellipse(x, y, dia, dia);
-    }
-    if(speed > 1.5){
-      render.stroke(colorH, 100, 100, 100*(speed-1.5)/3);
-      render.strokeWeight(7);
-      render.ellipse(x, y, dia*0.7, dia*0.7);
-    }
-    if(speed > 2.0){
-      render.stroke(colorH, 100, 100, 100*(speed-2.0)/3);
-      render.strokeWeight(10);
-      render.ellipse(x, y, dia*0.5, dia*0.5);
-    }
+      render.noFill();
+      render.colorMode(HSB,360,100,100);
+      if(speed > 1.0){
+        render.stroke(colorH, 100, 100, 100*(speed-1)/3);
+        render.strokeWeight(3);
+        render.ellipse(x, y, dia, dia);
+      }
+      if(speed > 1.5){
+        render.stroke(colorH, 100, 100, 100*(speed-1.5)/3);
+        render.strokeWeight(7);
+        render.ellipse(x, y, dia*0.7, dia*0.7);
+      }
+      if(speed > 2.0){
+        render.stroke(colorH, 100, 100, 100*(speed-2.0)/3);
+        render.strokeWeight(10);
+        render.ellipse(x, y, dia*0.5, dia*0.5);
+      }
   }
   
   void move(){

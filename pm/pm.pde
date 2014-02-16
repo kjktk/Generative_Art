@@ -5,7 +5,7 @@ import mappingtools.*;
 import ddf.minim.*;
 import ddf.minim.analysis.*;
 
-int numRipples = 3;
+int numRipples = 1;
 int numFlocks = 50;
 int numBarriers = 5;
 
@@ -64,7 +64,7 @@ void setup() {
   
   bMask.beginDraw();
   bMask.smooth();
-  bMask.background(255z);
+  bMask.background(255);
   bMask.endDraw();
   
   mask.beginDraw();
@@ -118,8 +118,8 @@ void draw() {
 void mousePressed() {
   if( mode == "PLAY" ) {
     flock.pull(mouseX,mouseY);
-    for(int i = 0;i < numRipples ; i++) {
-      flock.addRipple(new Ripple(mouseX,mouseY,random(5,20),int(random(180,200))));  
+    for(int i = 0;i < Math.round(random(1,4)) ; i++) {
+      flock.addRipple(new Ripple(mouseX*random(0.9,1.1),mouseY*random(0.9,1.1),random(5,20),int(random(180,200))));  
      }
   }
   else if ( mode == "ADD" ) {
