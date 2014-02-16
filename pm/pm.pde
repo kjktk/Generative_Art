@@ -83,7 +83,7 @@ void draw() {
   pg.smooth();
   pg.fill(0,50);
   pg.rect(-20, -20, width+40, height+40); //fixed
-  //drawFFT();
+  drawFFT();
   flock.run(pg);
   pg.endDraw();
   
@@ -97,7 +97,7 @@ void draw() {
     drawMeta();
     image(pg,0,0);
   } else {
-    qw.render(img);
+    //qw.render(img);
   }
 }
 
@@ -163,7 +163,7 @@ void keyPressed() {
 void debugMode() {
 }
 
-void drawGrid() {
+void drawGrid1() {
   int gridSize = 10;
   stroke(127, 127);
   strokeWeight(1);
@@ -172,6 +172,17 @@ void drawGrid() {
   }
   for (int y = 0; y < height; y+=gridSize) {
     line(0, y, width, y);
+  }
+}
+
+void drawGrid() {
+  int gridSize = 10;
+  noStroke();
+  for (int x = 0; x < width; x+=gridSize) {
+    for (int y = 0; y < height; y+=gridSize) {
+      fill(random(255));
+      rect(x,y, x+gridSize, y+gridSize);
+    }
   }
 }
 
