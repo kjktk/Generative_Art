@@ -5,7 +5,7 @@ import mappingtools.*;
 import ddf.minim.*;
 import ddf.minim.analysis.*;
 
-int numRipples = 1;
+int numRipples = 3;
 int numFlocks = 50;
 int numBarriers = 5;
 
@@ -17,6 +17,7 @@ Boolean gridFlag = false;
 color[] pixelBuffer;
 PGraphics pg;
 PGraphics mask;
+PGraphics bMask;
 PImage img;
 
 int ys = 25;
@@ -40,6 +41,7 @@ void setup() {
   
   pg = createGraphics(width,height,OPENGL);
   mask = createGraphics(width,height,OPENGL);
+  bMask = createGraphics(width,height,OPENGL);
   
   bw = new BezierWarp(this, 10);
   qw = new QuadWarp(this, 10);
@@ -60,6 +62,11 @@ void setup() {
   pg.colorMode(HSB,360,100,100);
   pg.endDraw();
   
+  bMask.beginDraw();
+  bMask.smooth();
+  bMask.background(255z);
+  bMask.endDraw();
+  
   mask.beginDraw();
   mask.smooth();
   mask.background(0);
@@ -79,13 +86,20 @@ void setup() {
 void draw() {
   background(0);
   
+  bMask.beginDraw();
+  bMask.smooth();
+  flock.bMask(bMask);
+  bMask.endDraw();
+  
   pg.beginDraw();
   pg.smooth();
-  pg.fill(0,50);
+  pg.fill(200,50);
   pg.rect(-20, -20, width+40, height+40); //fixed
   drawFFT();
   flock.run(pg);
   pg.endDraw();
+  
+  pg.mask(bMask);
   
   if ( maskFlag == true ) {
     pg.mask(mask);
@@ -105,8 +119,8 @@ void mousePressed() {
   if( mode == "PLAY" ) {
     flock.pull(mouseX,mouseY);
     for(int i = 0;i < numRipples ; i++) {
-      flock.addRipple(new Ripple(mouseX,mouseY,random(5,20),int(random(180,200))));
-    }
+      flock.addRipple(new Ripple(mouseX,mouseY,random(5,20),int(random(180,200))));  
+     }
   }
   else if ( mode == "ADD" ) {
     int flockType = Math.round(random(0,4));

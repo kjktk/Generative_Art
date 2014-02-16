@@ -18,21 +18,23 @@ class Flock {
       r.run(ripples,render);
     }
     for (Barrier b : barriers) {
-      b.run(barriers,render);
+      b.run(barriers);
     }
   }
-
+  void bMask(PGraphics mask) {
+    for (Barrier b : barriers) {
+      b.render(barriers,mask);
+    }
+  }
   void addBoid(Boid b) {
     boids.add(b);
   }
-  
   void addRipple(Ripple r) {
     ripples.add(r);
   }
   void addBarrier(Barrier b) {
     barriers.add(b);
-  }
-  
+  }  
   void pull(float x,float y) {
     for (Boid b : boids) {
       b.pull(boids,x,y); 

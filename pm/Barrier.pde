@@ -6,15 +6,10 @@ class Barrier {
     location = new PVector(_x, _y);
     diameter = _diameter;
   }
-  void run(ArrayList<Barrier> barriers,PGraphics render) {
-    render(render);
+  void run(ArrayList<Barrier> barriers) {
   }
-  void render(PGraphics render) {
-//    noStroke();
-//    fill(255,0,255,10);
-//    ellipse(location.x,location.y,pushLength,diameter*3);
-    render.fill(0,0,0,255);
-    render.stroke(255,0,255,100);
-    render.ellipse(location.x,location.y,diameter,diameter);
+  void render(ArrayList<Barrier> barriers,PGraphics mask) {
+    mask.fill(0);
+    mask.ellipse(location.x,location.y,diameter,diameter);
   }
 }
