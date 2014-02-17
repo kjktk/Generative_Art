@@ -37,8 +37,6 @@ void setup() {
   frameRate(30);
   smooth();
   
-  //noCursor();
-  
   pg = createGraphics(width,height,OPENGL);
   mask = createGraphics(width,height,OPENGL);
   bMask = createGraphics(width,height,OPENGL);
@@ -117,16 +115,19 @@ void draw() {
 
 void mousePressed() {
   if( mode == "PLAY" ) {
+    cursor();
     flock.pull(mouseX,mouseY);
     for(int i = 0;i < Math.round(random(1,4)) ; i++) {
       flock.addRipple(new Ripple(mouseX*random(0.9,1.1),mouseY*random(0.9,1.1),random(5,20),int(random(180,200))));  
      }
   }
   else if ( mode == "ADD" ) {
+    cursor();
     int flockType = Math.round(random(0,4));
     flock.addBoid(new Boid(mouseX,mouseY,flockType));
   }
   else if ( mode == "BARRIER" ) {
+    cursor();
     flock.addBarrier(new Barrier(mouseX,mouseY,70));
   }
 }
