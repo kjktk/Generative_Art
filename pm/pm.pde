@@ -91,7 +91,7 @@ void draw() {
   
   pg.beginDraw();
   pg.smooth();
-  pg.fill(200,50);
+  pg.fill(0,50);
   pg.rect(-20, -20, width+40, height+40); //fixed
   drawFFT();
   flock.run(pg);
@@ -133,7 +133,7 @@ void mousePressed() {
 }
 
 void stop() {
-  player.close();  //サウンドデータを終了
+  player.close();
   minim.stop();
   super.stop();
 }
