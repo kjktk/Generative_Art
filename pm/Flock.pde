@@ -34,15 +34,18 @@ class Flock {
   }
   void addBarrier(Barrier b) {
     barriers.add(b);
-  }  
+  }
+  void deleteBarrier(float x,float y) {
+    for (Barrier b : barriers) {
+      if ( b.delete(barriers,x,y) == true) {
+        barriers.remove(b);
+      }
+    }
+  }
   void pull(float x,float y) {
     for (Boid b : boids) {
       b.pull(boids,x,y); 
     }
   }
-  void push() {
-
-  }
-  
 }
 

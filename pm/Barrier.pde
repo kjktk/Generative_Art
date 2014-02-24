@@ -12,6 +12,13 @@ class Barrier {
     noStroke();
     mask.fill(0);
     mask.ellipse(location.x,location.y,diameter,diameter);
-
+  }
+  boolean delete(ArrayList<Barrier> barriers,float x,float y) {
+    PVector mouse = new PVector(x,y);
+    float d = PVector.dist(location,mouse);
+    if (Math.abs(d) < diameter) { 
+       return true;         
+    }
+    return false;
   }
 }

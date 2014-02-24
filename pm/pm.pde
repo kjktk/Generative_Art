@@ -129,6 +129,10 @@ void mousePressed() {
     cursor();
     flock.addBarrier(new Barrier(mouseX,mouseY,70));
   }
+  else if ( mode == "DELETE" ) {
+    cursor();
+    flock.deleteBarrier(mouseX,mouseY);
+  }
 }
 void stop() {
   player.close();  //サウンドデータを終了
@@ -149,6 +153,8 @@ void keyPressed() {
       mode = "AJUST";
   } else if (key == '6') {
       mode = "MASK";
+  } else if (key == '7') {
+      mode = "DELETE";
   }
   if (key == ENTER) {
     if (debug == true) {
