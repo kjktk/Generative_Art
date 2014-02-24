@@ -25,6 +25,8 @@ PImage img;
 int ys = 25;
 int yi = 15;
 
+int diameter = 0;
+
 BezierWarp    bw;
 QuadWarp      qw;
 Flock         flock;
@@ -110,6 +112,16 @@ void draw() {
   } else {
     qw.render(pg);
   }
+  
+  if (mousePressed) {
+    if ( mode == "BARRIER" ) {
+      diameter++;
+      bMask.beginDraw();
+      bMask.fill(0);
+      bMask.ellipse(mouseX,mouseY,diameter,diameter);
+      bMask.endDraw();
+    }
+  }
 }
 
 void mousePressed() {
@@ -120,25 +132,30 @@ void mousePressed() {
       flock.addRipple(new Ripple(mouseX*random(0.9,1.1),mouseY*random(0.9,1.1),random(5,20),int(random(180,200))));  
      }
   }
+  else if ( mode == "BARRIER" ) {
+  }
   else if ( mode == "ADD" ) {
     cursor();
     int flockType = Math.round(random(0,4));
     flock.addBoid(new Boid(mouseX,mouseY,flockType));
-  }
-  else if ( mode == "BARRIER" ) {
-    cursor();
-    flock.addBarrier(new Barrier(mouseX,mouseY,70));
   }
   else if ( mode == "DELETE" ) {
     cursor();
     flock.deleteBarrier(mouseX,mouseY);
   }
 }
-void stop() {
-  player.close();  //サウンドデータを終了
-  minim.stop();
-  super.stop();
+void mouseReleased() {
+  if ( mode == "BARRIER" ) {
+    flock.addBarrier(new Barrier(mouseX,mouseY,diameter));
+    diameter = 0;
+  }
 }
+
+//void stop() {
+//  player.close();  //サウンドデータを終了
+//  minim.stop();
+//  super.stop();
+//}
 
 void keyPressed() {
   if (key == '1') {
