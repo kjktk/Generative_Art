@@ -4,6 +4,8 @@ import fullscreen.*;
 import mappingtools.*;
 import ddf.minim.*;
 import ddf.minim.analysis.*;
+import processing.video.*;
+ 
 
 int numRipples = 1;
 int numFlocks = 50;
@@ -33,9 +35,11 @@ FFT           fft;
 
 void setup() {
   //new FullScreen(this).enter();
-  size(1280,720,OPENGL);
+  size(displayWidth,displayHeight,OPENGL);
   frameRate(30);
   smooth();
+  
+  //noCursor();
   
   pg = createGraphics(width,height,OPENGL);
   mask = createGraphics(width,height,OPENGL);
@@ -58,12 +62,8 @@ void setup() {
   
   pg.beginDraw();
   pg.colorMode(HSB,360,100,100);
+  pg.background(200,100,100);
   pg.endDraw();
-  
-  bMask.beginDraw();
-  bMask.smooth();
-  bMask.background(255);
-  bMask.endDraw();
   
   mask.beginDraw();
   mask.smooth();
@@ -91,25 +91,24 @@ void draw() {
   
   pg.beginDraw();
   pg.smooth();
-  pg.fill(0,50);
+  //drawGrid();
+  pg.fill(200,50,100,90);
   pg.rect(-20, -20, width+40, height+40); //fixed
-  drawFFT();
+  //drawFFT();
   flock.run(pg);
   pg.endDraw();
   
   pg.mask(bMask);
   
-  if ( maskFlag == true ) {
+  if ( mode == "MASK" ) {
     pg.mask(mask);
   }
-  if (gridFlag == true) {
-    drawGrid();
-  }
+
   if ( debug == true ) {
     drawMeta();
     image(pg,0,0);
   } else {
-    //qw.render(img);
+    qw.render(pg);
   }
 }
 
@@ -131,9 +130,8 @@ void mousePressed() {
     flock.addBarrier(new Barrier(mouseX,mouseY,70));
   }
 }
-
 void stop() {
-  player.close();
+  player.close();  //サウンドデータを終了
   minim.stop();
   super.stop();
 }
@@ -150,22 +148,7 @@ void keyPressed() {
   } else if (key == '5') {
       mode = "AJUST";
   } else if (key == '6') {
-    if (maskFlag == false) {
-      maskFlag = true;
-    } else {
-      maskFlag = false;
-    }
-      
-  } 
-  if (key == '7') {
-      save("projection.jpg");
-  }
-  if (key == '8') {
-    if (gridFlag == true) {
-      gridFlag = false;
-    } else {
-      gridFlag = true;
-    }
+      mode = "MASK";
   }
   if (key == ENTER) {
     if (debug == true) {
@@ -178,26 +161,15 @@ void keyPressed() {
 void debugMode() {
 }
 
-void drawGrid1() {
-  int gridSize = 10;
-  stroke(127, 127);
-  strokeWeight(1);
-  for (int x = 0; x < width; x+=gridSize) {
-    line(x, 0, x, height);
-  }
-  for (int y = 0; y < height; y+=gridSize) {
-    line(0, y, width, y);
-  }
-}
-
 void drawGrid() {
   int gridSize = 10;
-  noStroke();
+  pg.stroke(127, 127);
+  pg.strokeWeight(1);
   for (int x = 0; x < width; x+=gridSize) {
-    for (int y = 0; y < height; y+=gridSize) {
-      fill(random(255));
-      rect(x,y, x+gridSize, y+gridSize);
-    }
+    pg.line(x, 0, x, height);
+  }
+  for (int y = 0; y < height; y+=gridSize) {
+    pg.line(0, y, width, y);
   }
 }
 

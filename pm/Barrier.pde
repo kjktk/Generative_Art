@@ -9,7 +9,9 @@ class Barrier {
   void run(ArrayList<Barrier> barriers) {
   }
   void render(ArrayList<Barrier> barriers,PGraphics mask) {
+    noStroke();
     mask.fill(0);
     mask.ellipse(location.x,location.y,diameter,diameter);
+
   }
 }
