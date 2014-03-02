@@ -37,7 +37,7 @@ class Flock {
   }
   void deleteBarrier(float x,float y) {
     for (Barrier b : barriers) {
-      if ( b.delete(barriers,x,y) == true) {
+      if ( b.delete(x,y) == true) {
         barriers.remove(b);
       }
     }

@@ -59,19 +59,14 @@ class Boid {
    for (Boid n : boids) {
      for (Barrier barrier : barriers) {
        float d = PVector.dist(location, barrier.location);
-       if (Math.abs(d) < barrier.diameter*3) {
+       if (Math.abs(d) < barrier.diameter+300) {
          PVector steer = seek(barrier.location);
-         steer.mult(-0.05);
+         steer.mult(-0.01);
          applyForce(steer);
        }
-       else if (Math.abs(d) < barrier.diameter*2) {
+       else if (Math.abs(d) < barrier.diameter+100) {
          PVector steer = seek(barrier.location);
-         steer.mult(-0.3);
-         applyForce(steer);
-       }
-       else if (Math.abs(d) < barrier.diameter*1.5) {
-         PVector steer = seek(barrier.location);
-         steer.mult(-0.9);
+         steer.mult(-0.1);
          applyForce(steer);
        }
        else if (Math.abs(d) < barrier.diameter) {
