@@ -1,4 +1,2 @@
-Generative_Art
+Processing_Test
 ==============
-
-ジェネラティブアートっぽいもの
