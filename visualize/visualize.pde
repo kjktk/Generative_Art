@@ -12,6 +12,8 @@ String closestText;
 float closestTextX;
 float closestTextY;
 
+Integrator[] interpolatiors;
+
 void setup() {
   size(640, 400);
   mapImage = loadImage("map.png");
@@ -22,20 +24,19 @@ void setup() {
   
   dataTable = new Table("random.tsv");
   
+  interpolators = new Integrator[rowCount];
   for (int row = 0; row < rowCount; row++) {
-    float value = dataTable.getFloat(row, 1);
-    if (value > dataMax) {
-      dataMax = value;
-    }
-    if (value < dataMin) {
-      dataMin = value;
-    }
+    float initialValue = dataTable.getFloat(row, 1);
+    interpolators[row] = new Integrator(initialValue);
   }
   
   nameTable = new Table("names.tsv");
   
   PFont font = loadFont("Verdana-12.vlw");
   textFont(font);
+  
+  smooth();
+  noStroke();
 
 }
 
