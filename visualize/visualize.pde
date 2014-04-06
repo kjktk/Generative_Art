@@ -3,6 +3,7 @@ Table locationTable;
 int rowCount;
 
 Table dataTable;
+Table nameTable;
 //初期値
 float dataMin = MAX_FLOAT;
 float dataMax = MIN_FLOAT;
@@ -10,6 +11,7 @@ float dataMax = MIN_FLOAT;
 void setup() {
   size(640, 400);
   mapImage = loadImage("map.png");
+  
   locationTable = new Table("locations.tsv");
   //行数はグローバルに保存しておく
   rowCount = locationTable.getRowCount();
@@ -25,6 +27,8 @@ void setup() {
       dataMin = value;
     }
   }
+  
+  nameTable = new Table("names.tsv");
   
   PFont font = loadFont("Verdana-12.vlw");
   textFont(font);
@@ -48,16 +52,25 @@ void draw() {
 
 void drawData(float x,float y, String abbrev) {
   float value = dataTable.getFloat(abbrev, 1);
-  float diameter = 0;
+  float radius = 0;
+  
   if (value >= 0) {
     float a = map(value, 0, dataMax, 0, 255);
-    diameter = map(value, 0, dataMax, 3, 30);
+    radius = map(value, 0, dataMax, 1.5, 15);
     fill(#333366, a);
   } else {
     float a = map(value, 0, dataMax, 0, 255);
-    diameter = map(value, 0, dataMin, 3, 30);
+    radius = map(value, 0, dataMin, 1.5, 15);
     fill(#EC5166, a);
   }
-  ellipse(x, y, diameter, diameter);
+  ellipseMode(RADIUS);
+  ellipse(x, y, radius, radius);
+  
+  if (dist(x, y, mouseX, mouseY) < radius+2) {
+    fill(0);
+    textAlign(CENTER);
+    String name = nameTable.getString(abbrev, 1);
+    text(value + "(" + name + ")", x, y - radius - 4);
+  }
 }
 
