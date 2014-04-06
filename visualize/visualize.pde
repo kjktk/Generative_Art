@@ -45,7 +45,11 @@ void draw() {
 
 void drawData(float x,float y, String abbrev) {
   float value = dataTable.getFloat(abbrev, 1);
-  float mapped = map(value, dataMin, dataMax, 2, 40);
-  ellipse(x, y, mapped, mapped);
+  //正規化
+  float percent = norm(value, dataMin, dataMax);
+  //色にマップ
+  color between = lerpColor(#296F34, #61E2F0, percent, HSB);
+  fill(between);
+  ellipse(x, y, 15, 15);
 }
 
