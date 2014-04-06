@@ -47,11 +47,13 @@ void drawData(float x,float y, String abbrev) {
   float value = dataTable.getFloat(abbrev, 1);
   float diameter = 0;
   if (value >= 0) {
+    float a = map(value, 0, dataMax, 0, 255);
     diameter = map(value, 0, dataMax, 3, 30);
-    fill(#333366);
+    fill(#333366, a);
   } else {
+    float a = map(value, 0, dataMax, 0, 255);
     diameter = map(value, 0, dataMin, 3, 30);
-    fill(#EC5166);
+    fill(#EC5166, a);
   }
   ellipse(x, y, diameter, diameter);
 }
