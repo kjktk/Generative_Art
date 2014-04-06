@@ -67,10 +67,7 @@ void keyPressed() {
 }
 
 void updateTable() {
-  for (int row = 0; row < rowCount; row++) {
-    float newValue = random(dataMin, dataMax);
-    dataTable.setFloat(row, 1, newValue);
-  }
+  dataTable = new Table("http://benfry.com/writing/map/random.cgi");
 }
 
 void drawData(float x,float y, String abbrev) {
