@@ -25,6 +25,9 @@ void setup() {
       dataMin = value;
     }
   }
+  
+  PFont font = loadFont("Verdana-12.vlw");
+  textFont(font);
 
 }
 
