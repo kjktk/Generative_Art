@@ -7,6 +7,11 @@ Table nameTable;
 float dataMin = -10;
 float dataMax = 10;
 
+float closestDist;
+String closestText;
+float closestTextX;
+float closestTextY;
+
 void setup() {
   size(640, 400);
   mapImage = loadImage("map.png");
@@ -37,15 +42,21 @@ void setup() {
 void draw() {
   background(0);
   image(mapImage, 0, 0);
-  smooth();
-  fill(192, 0, 0);
-  noStroke();
+  
+  closestDist = MAX_FLOAT;
+  
   //位置ファイルの行をループして取得
   for (int row = 0; row < rowCount; row++) {
     String abbrev = dataTable.getRowName(row);
     float x = locationTable.getFloat(abbrev, 1);
     float y = locationTable.getFloat(abbrev, 2);
     drawData(x, y, abbrev);
+  }
+  
+  if (closestDist != MAX_FLOAT) {
+    fill(0);
+    textAlign(CENTER);
+    text(closestText, closestTextX, closestTextY);
   }
 }
 
@@ -78,11 +89,13 @@ void drawData(float x,float y, String abbrev) {
   ellipseMode(RADIUS);
   ellipse(x, y, radius, radius);
   
-  if (dist(x, y, mouseX, mouseY) < radius+2) {
-    fill(0);
-    textAlign(CENTER);
+  float d = dist(x, y, mouseX, mouseY);
+  if (d < radius+2 && d < closestDist) {
+    closestDist = d;
     String name = nameTable.getString(abbrev, 1);
-    text(nf(value,0,2) + "(" + name + ")", x, y - radius - 4);
+    closestText = name + " " + nf(value,0,2);
+    closestTextX = x;
+    closestTextY = y - radius - 4;
   }
 }
 
