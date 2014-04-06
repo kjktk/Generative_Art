@@ -4,9 +4,8 @@ int rowCount;
 
 Table dataTable;
 Table nameTable;
-//初期値
-float dataMin = MAX_FLOAT;
-float dataMax = MIN_FLOAT;
+float dataMin = -10;
+float dataMax = 10;
 
 void setup() {
   size(640, 400);
@@ -50,6 +49,19 @@ void draw() {
   }
 }
 
+void keyPressed() {
+  if (key == ' ') {
+    updateTable();
+  }
+}
+
+void updateTable() {
+  for (int row = 0; row < rowCount; row++) {
+    float newValue = random(dataMin, dataMax);
+    dataTable.setFloat(row, 1, newValue);
+  }
+}
+
 void drawData(float x,float y, String abbrev) {
   float value = dataTable.getFloat(abbrev, 1);
   float radius = 0;
@@ -70,7 +82,7 @@ void drawData(float x,float y, String abbrev) {
     fill(0);
     textAlign(CENTER);
     String name = nameTable.getString(abbrev, 1);
-    text(value + "(" + name + ")", x, y - radius - 4);
+    text(nf(value,0,2) + "(" + name + ")", x, y - radius - 4);
   }
 }
 
