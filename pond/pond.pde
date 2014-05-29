@@ -1,3 +1,4 @@
+import codeanticode.syphon.*;
 import processing.opengl.*;
 import controlP5.*;
 import fullscreen.*;
@@ -13,10 +14,12 @@ PGraphics pg;
 PImage img;
 PImage mask;
 
+SyphonServer server;
+
 Flock flock;
 void setup() {
   //new FullScreen(this).enter();
-  size(1280,720);
+  size(displayWidth,displayHeight,P3D);
   colorMode(HSB,360,100,100);
   frameRate(30);
   smooth();
@@ -32,6 +35,7 @@ void setup() {
   
 
   background(0);
+  server = new SyphonServer(this, "Processing Syphon");
 }
 
 void draw() {
@@ -39,7 +43,7 @@ void draw() {
   drawGrid();
   rect(-20, -20, width+40, height+40); //fixed
   flock.run();
-  //image(mask,0,0);
+  server.sendImage(g);
 }
 
 void mousePressed() {

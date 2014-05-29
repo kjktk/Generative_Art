@@ -5,7 +5,9 @@ import mappingtools.*;
 import ddf.minim.*;
 import ddf.minim.analysis.*;
 import processing.video.*;
- 
+import codeanticode.syphon.*;
+
+SyphonServer server;
 
 int numRipples = 1;
 int numFlocks = 50;
@@ -47,8 +49,8 @@ void setup() {
   mask = createGraphics(width,height,OPENGL);
   bMask = createGraphics(width,height,OPENGL);
   
-  bw = new BezierWarp(this, 10);
-  qw = new QuadWarp(this, 10);
+//  bw = new BezierWarp(this, 10);
+//  qw = new QuadWarp(this, 10);
   
   flock = new Flock();
   
@@ -64,7 +66,7 @@ void setup() {
   
   pg.beginDraw();
   pg.colorMode(HSB,360,100,100);
-  pg.background(200,100,100);
+  pg.background(0);
   pg.endDraw();
   
   mask.beginDraw();
@@ -81,6 +83,8 @@ void setup() {
   fft = new FFT( player.bufferSize(), player.sampleRate() );
   
   textFont(createFont("Serif", 12));
+  
+  server = new SyphonServer(this, "Processing Syphon");
 }
 
 void draw() {
@@ -94,7 +98,7 @@ void draw() {
   pg.beginDraw();
   pg.smooth();
   //drawGrid();
-  pg.fill(200,50,100,90);
+  pg.fill(0,30);
   pg.rect(-20, -20, width+40, height+40); //fixed
   //drawFFT();
   flock.run(pg);
@@ -105,14 +109,16 @@ void draw() {
   if ( mode == "MASK" ) {
     pg.mask(mask);
   }
-
-  if ( debug == true ) {
-    drawMeta();
-    image(pg,0,0);
-  } else {
-    qw.render(pg);
-  }
   
+  image(pg,0,0);
+
+//  if ( debug == true ) {
+//    drawMeta();
+//    image(pg,0,0);
+//  } else {
+//    qw.render(pg);
+//  }
+//  
   if (mousePressed) {
     if ( mode == "BARRIER" ) {
       diameter++;
@@ -122,6 +128,8 @@ void draw() {
       bMask.endDraw();
     }
   }
+  
+  server.sendImage(g);
 }
 
 void mousePressed() {
