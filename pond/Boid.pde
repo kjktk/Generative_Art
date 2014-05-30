@@ -11,8 +11,8 @@ class Boid {
   float r;
   float maxforce;    // Maximum steering force
   float maxspeed;    // Maximum speed
-    
-  
+
+
   Boid(float x, float y, int type) {
     for (int i = 0; i < 4; i++) {
       imgs[i] = loadImage(imgNames[type]+"_"+i+".png");
@@ -32,31 +32,31 @@ class Boid {
     maxforce = 0.05;
     _scale = random(0.5,1.7);
   }
-  
+
   void run(ArrayList<Boid> boids) {
     flock(boids);
     update();
     borders();
     render();
   }
-  
+
   void pull(ArrayList<Boid> boids,float x,float y) {
     PVector mouse = new PVector(x,y);
     for (Boid n : boids) {
       float d = PVector.dist(location,mouse);
-      if (Math.abs(d) < 200) { 
+      if (Math.abs(d) < 200) {
           PVector steer = seek(mouse);
           steer.mult(0.3);
           applyForce(steer);
       }
-      if (Math.abs(d) < 100) { 
+      if (Math.abs(d) < 100) {
           PVector steer = seek(mouse);
           steer.mult(0.8);
           applyForce(steer);
       }
     }
   }
-  
+
  void push(ArrayList<Boid> boids,ArrayList<Barrier> barriers) {
    PVector sum = new PVector(0, 0);
    for (Boid n : boids) {
@@ -99,7 +99,7 @@ class Boid {
     sep.mult(1.5);
     ali.mult(1.0);
     coh.mult(1.0);
-    
+
     applyForce(sep);
     applyForce(ali);
     applyForce(coh);
@@ -138,7 +138,7 @@ class Boid {
     // Draw a triangle rotated in the direction of velocity
     float theta = velocity.heading2D() + radians(90);
     // heading2D() above is now heading() but leaving old syntax until Processing.js catches up
-   
+
     pushMatrix();
     translate(location.x, location.y);
     rotate(theta);
@@ -146,8 +146,8 @@ class Boid {
     tint(0,0,100,random(150,200));
     image(img,0,0,img.width*_scale,img.height*_scale);
     _count++;
-    popMatrix(); 
-    
+    popMatrix();
+
   }
 
   void borders() {
@@ -156,12 +156,12 @@ class Boid {
     if (location.x > width+r) location.x = -r;
     if (location.y > height+r) location.y = -r;
   }
-  
+
   PVector separate (ArrayList<Boid> boids) {
     float desiredseparation = 25.0f;
     PVector steer = new PVector(0, 0, 0);
     int count = 0;
-    
+
     for (Boid other : boids) {
       float d = PVector.dist(location, other.location);
       // If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
@@ -174,7 +174,7 @@ class Boid {
         count++;            // Keep track of how many
       }
     }
-    
+
     if (count > 0) {
       steer.div((float)count);
     }
@@ -216,7 +216,7 @@ class Boid {
       PVector steer = PVector.sub(sum, velocity);
       steer.limit(maxforce);
       return steer;
-    } 
+    }
     else {
       return new PVector(0, 0);
     }
@@ -236,7 +236,7 @@ class Boid {
     if (count > 0) {
       sum.div(count);
       return seek(sum);
-    } 
+    }
     else {
       return new PVector(0, 0);
     }

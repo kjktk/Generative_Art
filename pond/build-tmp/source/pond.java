@@ -8,6 +8,7 @@ import processing.opengl.*;
 import controlP5.*; 
 import fullscreen.*; 
 import ddf.minim.*; 
+import ddf.minim.effects.*; 
 
 import java.util.HashMap; 
 import java.util.ArrayList; 
@@ -19,6 +20,7 @@ import java.io.OutputStream;
 import java.io.IOException; 
 
 public class pond extends PApplet {
+
 
 
 
@@ -421,7 +423,7 @@ class Flock {
   ArrayList<Boid> boids;
   ArrayList<Barrier> barriers;
   ArrayList<Ripple> ripples;
-  
+
   Flock() {
     boids = new ArrayList<Boid>();
     ripples = new ArrayList<Ripple>();
@@ -444,23 +446,22 @@ class Flock {
   public void addBoid(Boid b) {
     boids.add(b);
   }
-  
+
   public void addRipple(Ripple r) {
     ripples.add(r);
   }
   public void addBarrier(Barrier b) {
     barriers.add(b);
   }
-  
+
   public void pull(float x,float y) {
     for (Boid b : boids) {
-      b.pull(boids,x,y); 
+      b.pull(boids,x,y);
     }
   }
   public void push() {
 
   }
-  
 }
 
 float FRICTION = 0.985f; //\u6ce2\u7d0b\u306e\u6e1b\u8870\u7387
