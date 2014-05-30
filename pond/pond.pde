@@ -2,6 +2,8 @@ import codeanticode.syphon.*;
 import processing.opengl.*;
 import controlP5.*;
 import fullscreen.*;
+import ddf.minim.*;
+import ddf.minim.effects.*;
 
 int numRipples = 1;
 int numFlocks = 50;
@@ -13,28 +15,33 @@ color[] pixelBuffer;
 PGraphics pg;
 PImage img;
 PImage mask;
-
+Minim minim;
+AudioPlayer player;
 SyphonServer server;
 
 Flock flock;
 void setup() {
-  //new FullScreen(this).enter();
+  //base setting
   size(displayWidth,displayHeight,P3D);
   colorMode(HSB,360,100,100);
+  background(0);
   frameRate(30);
   smooth();
   //noCursor();
-  
-  mask = loadImage("mask.png");
+
+  //minim
+  minim = new Minim(this);
+  player = minim.loadFile("loop.mp3");
+  player.play();
+
+  //flock
   flock = new Flock();
-  
   for (int i = 0; i < numFlocks; i++) {
     int flockType = Math.round(random(0,4));
     flock.addBoid(new Boid(random(width),random(height),flockType));
   }
-  
 
-  background(0);
+  //syphon
   server = new SyphonServer(this, "Processing Syphon");
 }
 
@@ -44,6 +51,12 @@ void draw() {
   rect(-20, -20, width+40, height+40); //fixed
   flock.run();
   server.sendImage(g);
+}
+
+void stop() {
+  player.close();
+  minim.stop();
+  super.stop();
 }
 
 void mousePressed() {
@@ -63,29 +76,20 @@ void mousePressed() {
 }
 
 void keyPressed() {
-  if (key == '1') {
+  switch(key) {
+    case 1:
       mouseMode = "PLAY";
-  } else if (key == '2') {
+      break;
+    case 2:
       mouseMode = "ADD";
-  } else if (key == '3') {
+      break;
+    case 3:
       mouseMode = "BARRIER";
-  } else if (key == '4') {
-      mouseMode = "LOTUS";
-  } else if (key == '5') {
-      mouseMode = "AJUST";
-  } else if (key == '6') {
-      mouseMode = "MASK";
-  }
-  if (key == ENTER) {
-    if (debug == true) {
-      debug = false;
-    } else {
-      debug = true;
-    }
+      break;
   }
 }
 void debugMode() {
- 
+
 }
 
 void drawGrid() {
@@ -105,7 +109,7 @@ PImage renderImage() {
   fill(0,50);
   rect(-20, -20, width+40, height+40); //fixed
   flock.run();
-  
+
   loadPixels();
   arrayCopy(pixels,pixelBuffer);
   for (int i = 0; i < width * height; i++) {
