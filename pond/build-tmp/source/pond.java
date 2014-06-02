@@ -37,9 +37,9 @@ Boolean debug = false;
 int[] pixelBuffer;
 PGraphics pg;
 PImage img;
-PImage mask;
 Minim minim;
-AudioPlayer player;
+AudioPlayer bgm;
+AudioPlayer seAdd;
 SyphonServer server;
 
 Flock flock;
@@ -54,8 +54,9 @@ public void setup() {
 
   //minim
   minim = new Minim(this);
-  player = minim.loadFile("loop.mp3");
-  player.play();
+  bgm = minim.loadFile("loop.mp3");
+  //bgm.play();
+  seAdd = minim.loadFile("button01a.mp3");
 
   //flock
   flock = new Flock();
@@ -77,7 +78,7 @@ public void draw() {
 }
 
 public void stop() {
-  player.close();
+  bgm.close();
   minim.stop();
   super.stop();
 }
@@ -88,10 +89,15 @@ public void mousePressed() {
     for(int i = 0;i < numRipples ; i++) {
       flock.addRipple(new Ripple(mouseX,mouseY,random(5,20),PApplet.parseInt(random(180,200))));
     }
+    seAdd.play();
+    seAdd.rewind();
   }
   else if ( mouseMode == "ADD" ) {
     int flockType = Math.round(random(0,4));
     flock.addBoid(new Boid(mouseX,mouseY,flockType));
+    seAdd.play();
+    seAdd.rewind();
+
   }
   else if ( mouseMode == "BARRIER" ) {
     flock.addBarrier(new Barrier(mouseX,mouseY,random(90)));
@@ -187,8 +193,8 @@ class Boid {
   float r;
   float maxforce;    // Maximum steering force
   float maxspeed;    // Maximum speed
-    
-  
+
+
   Boid(float x, float y, int type) {
     for (int i = 0; i < 4; i++) {
       imgs[i] = loadImage(imgNames[type]+"_"+i+".png");
@@ -208,31 +214,31 @@ class Boid {
     maxforce = 0.05f;
     _scale = random(0.5f,1.7f);
   }
-  
+
   public void run(ArrayList<Boid> boids) {
     flock(boids);
     update();
     borders();
     render();
   }
-  
+
   public void pull(ArrayList<Boid> boids,float x,float y) {
     PVector mouse = new PVector(x,y);
     for (Boid n : boids) {
       float d = PVector.dist(location,mouse);
-      if (Math.abs(d) < 200) { 
+      if (Math.abs(d) < 200) {
           PVector steer = seek(mouse);
           steer.mult(0.3f);
           applyForce(steer);
       }
-      if (Math.abs(d) < 100) { 
+      if (Math.abs(d) < 100) {
           PVector steer = seek(mouse);
           steer.mult(0.8f);
           applyForce(steer);
       }
     }
   }
-  
+
  public void push(ArrayList<Boid> boids,ArrayList<Barrier> barriers) {
    PVector sum = new PVector(0, 0);
    for (Boid n : boids) {
@@ -275,7 +281,7 @@ class Boid {
     sep.mult(1.5f);
     ali.mult(1.0f);
     coh.mult(1.0f);
-    
+
     applyForce(sep);
     applyForce(ali);
     applyForce(coh);
@@ -314,7 +320,7 @@ class Boid {
     // Draw a triangle rotated in the direction of velocity
     float theta = velocity.heading2D() + radians(90);
     // heading2D() above is now heading() but leaving old syntax until Processing.js catches up
-   
+
     pushMatrix();
     translate(location.x, location.y);
     rotate(theta);
@@ -322,8 +328,8 @@ class Boid {
     tint(0,0,100,random(150,200));
     image(img,0,0,img.width*_scale,img.height*_scale);
     _count++;
-    popMatrix(); 
-    
+    popMatrix();
+
   }
 
   public void borders() {
@@ -332,12 +338,12 @@ class Boid {
     if (location.x > width+r) location.x = -r;
     if (location.y > height+r) location.y = -r;
   }
-  
+
   public PVector separate (ArrayList<Boid> boids) {
     float desiredseparation = 25.0f;
     PVector steer = new PVector(0, 0, 0);
     int count = 0;
-    
+
     for (Boid other : boids) {
       float d = PVector.dist(location, other.location);
       // If the distance is greater than 0 and less than an arbitrary amount (0 when you are yourself)
@@ -350,7 +356,7 @@ class Boid {
         count++;            // Keep track of how many
       }
     }
-    
+
     if (count > 0) {
       steer.div((float)count);
     }
@@ -392,7 +398,7 @@ class Boid {
       PVector steer = PVector.sub(sum, velocity);
       steer.limit(maxforce);
       return steer;
-    } 
+    }
     else {
       return new PVector(0, 0);
     }
@@ -412,7 +418,7 @@ class Boid {
     if (count > 0) {
       sum.div(count);
       return seek(sum);
-    } 
+    }
     else {
       return new PVector(0, 0);
     }

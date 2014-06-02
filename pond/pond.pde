@@ -14,9 +14,9 @@ Boolean debug = false;
 color[] pixelBuffer;
 PGraphics pg;
 PImage img;
-PImage mask;
 Minim minim;
-AudioPlayer player;
+AudioPlayer bgm;
+AudioPlayer seAdd;
 SyphonServer server;
 
 Flock flock;
@@ -31,8 +31,9 @@ void setup() {
 
   //minim
   minim = new Minim(this);
-  player = minim.loadFile("loop.mp3");
-  player.play();
+  bgm = minim.loadFile("loop.mp3");
+  //bgm.play();
+  seAdd = minim.loadFile("button01a.mp3");
 
   //flock
   flock = new Flock();
@@ -54,7 +55,7 @@ void draw() {
 }
 
 void stop() {
-  player.close();
+  bgm.close();
   minim.stop();
   super.stop();
 }
@@ -65,10 +66,15 @@ void mousePressed() {
     for(int i = 0;i < numRipples ; i++) {
       flock.addRipple(new Ripple(mouseX,mouseY,random(5,20),int(random(180,200))));
     }
+    seAdd.play();
+    seAdd.rewind();
   }
   else if ( mouseMode == "ADD" ) {
     int flockType = Math.round(random(0,4));
     flock.addBoid(new Boid(mouseX,mouseY,flockType));
+    seAdd.play();
+    seAdd.rewind();
+
   }
   else if ( mouseMode == "BARRIER" ) {
     flock.addBarrier(new Barrier(mouseX,mouseY,random(90)));
