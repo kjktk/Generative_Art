@@ -1,3 +1,4 @@
+import processing.serial.*;
 import codeanticode.syphon.*;
 import processing.opengl.*;
 import controlP5.*;
@@ -9,6 +10,7 @@ int numRipples = 1;
 int numFlocks = 50;
 int numBarriers = 5;
 int interval = 0;
+int sensorValue;
 String mouseMode = "PLAY";
 Boolean debug = false;
 color[] pixelBuffer;
@@ -18,9 +20,10 @@ Minim minim;
 AudioPlayer bgm;
 AudioPlayer seAdd;
 SyphonServer server;
+Serial port;
 
 Flock flock;
-void setup() {
+void setup() { 
   //base setting
   size(displayWidth,displayHeight,P3D);
   colorMode(HSB,360,100,100);
@@ -28,6 +31,10 @@ void setup() {
   frameRate(30);
   smooth();
   //noCursor();
+  
+  //Serial
+  println(Serial.list());
+  port = new Serial(this, Serial.list()[5], 9600);
 
   //minim
   minim = new Minim(this);
@@ -52,12 +59,6 @@ void draw() {
   rect(-20, -20, width+40, height+40); //fixed
   flock.run();
   server.sendImage(g);
-}
-
-void stop() {
-  bgm.close();
-  minim.stop();
-  super.stop();
 }
 
 void mousePressed() {
@@ -98,6 +99,13 @@ void debugMode() {
 
 }
 
+void serialEvent(Serial port) {
+  String myString = port.readStringUntil('\n');
+  myString = trim(myString);
+  sensorValue = myString;
+}
+
+
 void drawGrid() {
   int gridSize = 10;
   stroke(127, 127);
@@ -133,3 +141,10 @@ PImage renderImage() {
   PImage img = pg.get(0,0,pg.width,pg.height);
   return img;
 }
+
+void stop() {
+  bgm.close();
+  minim.stop();
+  super.stop();
+}
+
