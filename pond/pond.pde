@@ -10,7 +10,6 @@ int numRipples = 1;
 int numFlocks = 50;
 int numBarriers = 5;
 int interval = 0;
-int sensorValue;
 String mouseMode = "PLAY";
 Boolean debug = false;
 color[] pixelBuffer;
@@ -35,6 +34,7 @@ void setup() {
   //Serial
   println(Serial.list());
   port = new Serial(this, Serial.list()[5], 9600);
+  port.bufferUntil('\n');
 
   //minim
   minim = new Minim(this);
@@ -58,6 +58,7 @@ void draw() {
   drawGrid();
   rect(-20, -20, width+40, height+40); //fixed
   flock.run();
+  
   server.sendImage(g);
 }
 
@@ -99,10 +100,9 @@ void debugMode() {
 
 }
 
-void serialEvent(Serial port) {
-  String myString = port.readStringUntil('\n');
-  myString = trim(myString);
-  sensorValue = myString;
+void serialEvent(Serial p) {
+  String sensorString = port.readStringUntil('\n');
+  println(sensorString);
 }
 
 
