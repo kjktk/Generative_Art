@@ -32,9 +32,9 @@ void setup() {
   //noCursor();
   
   //Serial
-  println(Serial.list());
-  port = new Serial(this, Serial.list()[5], 9600);
-  port.bufferUntil('\n');
+  //println(Serial.list());
+  //port = new Serial(this, Serial.list()[5], 9600);
+  //port.bufferUntil('\n');
 
   //minim
   minim = new Minim(this);
