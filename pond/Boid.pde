@@ -11,7 +11,8 @@ class Boid {
   float r;
   float maxforce;    // Maximum steering force
   float maxspeed;    // Maximum speed
-
+  
+  ArrayList<Emitter> emitter = new ArrayList <Emitter>();; 
 
   Boid(float x, float y, int type) {
     for (int i = 0; i < 4; i++) {
@@ -19,18 +20,17 @@ class Boid {
     }
     acceleration = new PVector(0, 0);
 
-    // This is a new PVector method not yet implemented in JS
-    // velocity = PVector.random2D();
-
     // Leaving the code temporarily this way so that this example runs in JS
     float angle = random(TWO_PI);
     velocity = new PVector(cos(angle), sin(angle));
 
     location = new PVector(x, y);
-    r = 50;
+    r = 100;
     maxspeed = 4;
-    maxforce = 0.05;
-    _scale = random(0.5,1.7);
+    maxforce = 0.03;
+    _scale = random(0.3,1.5);
+    
+    emitter.add(new Emitter(location.x,location.y));
   }
 
   void run(ArrayList<Boid> boids) {
@@ -38,6 +38,11 @@ class Boid {
     update();
     borders();
     render();
+    for(int i = 0; i < emitter.size(); i++) {
+       Emitter e = emitter.get(i);
+       e.move(location.x,location.y);
+       e.update();
+    }
   }
 
   void pull(ArrayList<Boid> boids,float x,float y) {
@@ -51,7 +56,7 @@ class Boid {
       }
       if (Math.abs(d) < 100) {
           PVector steer = seek(mouse);
-          steer.mult(0.8);
+          steer.mult(0.5);
           applyForce(steer);
       }
     }
@@ -142,12 +147,12 @@ class Boid {
     pushMatrix();
     translate(location.x, location.y);
     rotate(theta);
-    PImage img = imgs[_count/10 %imgs.length];
+    PImage img = imgs[_count / 5 % imgs.length];
     tint(0,0,100,random(150,200));
     image(img,0,0,img.width*_scale,img.height*_scale);
     _count++;
     popMatrix();
-
+    
   }
 
   void borders() {
