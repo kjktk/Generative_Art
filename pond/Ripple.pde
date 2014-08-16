@@ -1,8 +1,8 @@
-float FRICTION = 0.985; //波紋の減衰率
+float FRICTION = 0.985;
 
 public class Ripple{
-  int x, y;     //波紋の中心座標
-  float dia;    //波紋の直径
+  int x, y;
+  float dia;    
   float speed;
   int colorH;   
   boolean flag = false;
@@ -11,7 +11,7 @@ public class Ripple{
     x = _x;
     y = _y;
     speed = _speed;
-    colorH = _colorH;
+    colorH = _colorH + int(random(-20,20));
     dia = 0.0;
     flag = true;
   }
@@ -44,9 +44,9 @@ public class Ripple{
   }
   
   void move(){
-    dia += speed;      //直径を速度分大きく
-    speed *= FRICTION; //速度減衰
-    if(speed < 1.0){   //速度が1.0以下になったら描画しない設定
+    dia += speed;      
+    speed *= FRICTION;
+    if(speed < 1.0){
       flag = false;
     }
   }
