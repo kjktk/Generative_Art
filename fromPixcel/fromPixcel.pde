@@ -9,9 +9,9 @@ void setup() {
   img = loadImage("sakura.png");
   img.loadPixels();
   p = new ArrayList<Particle>();
-  for(int j = 0; j< img.height; j++) {
-    for(int i = 0; i < img.width; i++) {
-      p.add(new Particle(i,j,2,5,img.pixels[j*img.width + i])); 
+  for(int j = 0; j< img.height; j+=mosaicSize) {
+    for(int i = 0; i < img.width; i+=mosaicSize) {
+      p.add(new Particle(i,j,5,5,img.pixels[j*img.width + i])); 
     }
   }
 }
