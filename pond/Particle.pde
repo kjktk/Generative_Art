@@ -2,16 +2,19 @@ class Particle
 {
   float FRICTION = 0.985;
   float x,y;
+  float initX, initY;
   float size;
-  color colorH;
+  int colorH;
   float speed;
   boolean flag = false;
-  Particle(float _x,float _y,float _size,float _speed){
+  Particle(float _x,float _y,float _size,float _speed, int _color){
     x = _x;
     y = _y;
+    initX = x;
+    initY = y;
     size = _size;
     speed = _speed;
-    colorH = color(random(300),100*speed/3,100*speed/3);
+    colorH = _color;
     flag = true;
   }
    
@@ -31,17 +34,30 @@ class Particle
       flag = false;
     }
   }
+  void pull(float tx, float ty) {
+    float dist = sqrt((tx-x)*(tx-x)+(ty-y)*(ty-y));
+    float direction = atan2(x-tx,ty-y)+HALF_PI;
+    x += speed*dist*cos(direction) / 100;
+    y += speed*dist*sin(direction) / 100;
+    speed *= FRICTION;
+    if(speed < 1.0){
+      flag = false;
+    }
+  }
+  void init() {
+    move(initX,initY);
+  }
   void draw(){
     pushStyle();
     colorMode(HSB);
     noStroke();
-    fill(colorH);
+    fill(colorH, 100, 100, 100*speed/3);
     ellipse(x,y, size, size);
     popStyle();
   }
   void explode() {
-    x = random(100) - 50;
-    y = random(100) - 50;
+    x = random(width);
+    y = random(height);
   }
   boolean is_flag() {
     return flag;

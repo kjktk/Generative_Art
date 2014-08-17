@@ -16,7 +16,7 @@ class Emitter {
   }
   void update() {
     for (int i = 0; i < MAX_PARTICLE; i++) {
-      particles.add(new Particle(location.x,location.y,random(10),5));
+      particles.add(new Particle(location.x,location.y,random(10),5,(int)random(360)));
     }
     
     for(int i = 0; i < particles.size(); i++) {
