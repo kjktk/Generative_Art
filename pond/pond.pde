@@ -13,6 +13,7 @@ import netP5.*;
 int numRipples = 10;
 int numFlocks = 50;
 int numBarriers = 5;
+int numWagara = 5;
 int interval = 0;
 String mouseMode = "PLAY";
 Boolean debug = false;
@@ -44,16 +45,17 @@ float initRoll = roll;
 float diffYaw;
 float diffPitch;
 float diffRoll;
+
 Flock flock;
 
-
+ArrayList <PixelArt> wagara;
 
 void setup() { 
   //base setting
   size(displayWidth,displayHeight,OPENGL);
   colorMode(HSB,360,100,100);
   background(0);
-  frameRate(30);
+  frameRate(24);
   smooth();
   noCursor();
   
@@ -76,7 +78,13 @@ void setup() {
     int flockType = Math.round(random(3,4));
     flock.addBoid(new Boid(random(width),random(height),flockType));
   }
-
+  
+  wagara = new ArrayList<PixelArt>();
+  for (int i = 0; i < numWagara; i++) {
+    PImage[] img = new PImage[4];
+    
+  }
+  
   //OSC
   if (useOSC) {
     osc = new OscP5(this,9000);
@@ -94,10 +102,9 @@ void setup() {
 
 void draw() {
   fill(0,60);
-  rect(-20, -20, width+40, height+40); //fixed
+  rect(-20, -20, width+40, height+40);
   pushStyle();
   blendMode(ADD);
-  //drawGrid();
   //flock
   flock.run();
   if (accel < 0.5) {
@@ -117,6 +124,7 @@ void draw() {
   }
 
   popStyle();
+  
   server.sendImage(g);
   
   println(" accel: "+accel);
@@ -129,6 +137,7 @@ void mousePressed() {
     for(int i = 0;i < numRipples ; i++) {
       flock.addRipple(new Ripple(mouseX,mouseY,random(5,10),int(random(180,200))));
     }
+    
     seAdd.play();
     seAdd.rewind();
   }

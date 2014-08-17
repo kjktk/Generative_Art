@@ -6,10 +6,10 @@ class PixelArt {
   float x;
   float y;
   
-  PixelArt(float _x, float _y, String imageName) {
+  PixelArt(float _x, float _y, PImage _img) {
     x = _x;
     y = _y;
-    img = loadImage(imageName);
+    img = _img;
     img.loadPixels();
     p = new ArrayList<Particle>();
     for(int j = 0; j< img.height; j+=mosaicSize) {
@@ -22,15 +22,14 @@ class PixelArt {
     }
   }
   void update(){
-    if (flag == true) {
       this.draw();
-    }
   }
   void draw() {
-  for(int i = 0; i < p.size(); i++) {
-    Particle dot = p.get(i);
-    dot.update();
-    dot.init();
+    for(int i = 0; i < p.size(); i++) {
+      Particle dot = p.get(i);
+      dot.update();
+      dot.init();
+    }
   }
   void move(float tx,float ty){
     float dist = sqrt((tx-x)*(tx-x)+(ty-y)*(ty-y));
