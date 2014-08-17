@@ -40,6 +40,9 @@ public class Ripple{
       stroke(colorH, 90, 95, 100*(speed-2.0)/3);
       strokeWeight(7);
       ellipse(x, y, dia*0.7, dia*0.7);
+      strokeWeight(2);
+      stroke(colorH, 90, 95, 100*(speed-3)/3);
+      ellipse(x + random(-100,100), y + random(-100,100), dia *0.3, dia *0.3);
     }
   }
   
