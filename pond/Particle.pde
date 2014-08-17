@@ -53,6 +53,9 @@ class Particle
     noStroke();
     fill(colorH, 100, 100, 100*speed/3);
     ellipse(x,y, size, size);
+    fill(colorH, 70, 100, 100*speed/3);
+    ellipse(x  -5,y -5, size * 0.8, size *0.8);
+    ellipse(x + 5,y + 5, size * 0.8, size *0.8);
     popStyle();
   }
   void explode() {

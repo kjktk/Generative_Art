@@ -23,7 +23,7 @@ class Emitter {
       Particle p = particles.get(i);
       if(p.is_flag()){
         p.update();
-        p.move(random(location.x - 50,location.x + 50),random(location.y-50,location.y+50));
+        p.move(random(location.x - 10,location.x + 10),random(location.y-10,location.y+10));
       } else {
         particles.remove(i);
       }
