@@ -1,30 +1,21 @@
 PImage img;
-int mosaicSize = 3;
-color[] _pixels;
-ArrayList<Particle> p;
+ArrayList <PixelArt> wagara;
 void setup() {
   size(640, 480);
+  colorMode(HSB,360,100,100);
   noStroke();
  
-  img = loadImage("sakura.png");
-  img.loadPixels();
-  p = new ArrayList<Particle>();
-  for(int j = 0; j< img.height; j+=mosaicSize) {
-    for(int i = 0; i < img.width; i+=mosaicSize) {
-      p.add(new Particle(i,j,5,10,img.pixels[j*img.width + i]));
-      for (Particle dot : p) {
-        dot.explode();
-      }
-    }
+  wagara = new ArrayList<PixelArt>();
+  for (int i = 0; i < 1; i++) {
+    img = loadImage("sakura.png");
+    wagara.add(new PixelArt(random(width),random(height),img));
   }
 }
  
 void draw() {
   background(0);
-  for(int i = 0; i < p.size(); i++) {
-    Particle dot = p.get(i);
-    dot.update();
-    dot.init();
+  for (PixelArt w : wagara) {
+    w.update();
   }
 }
 
