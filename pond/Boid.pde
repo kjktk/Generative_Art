@@ -63,9 +63,11 @@ class Boid {
   }
 
  void push(ArrayList<Boid> boids,ArrayList<Barrier> barriers) {
+   
    PVector sum = new PVector(0, 0);
    for (Boid n : boids) {
      for (Barrier barrier : barriers) {
+       if (barrier.is_push) {
        float d = PVector.dist(location, barrier.location);
        if (Math.abs(d) < barrier.diameter*3) {
          PVector steer = seek(barrier.location);
@@ -74,18 +76,19 @@ class Boid {
        }
        else if (Math.abs(d) < barrier.diameter*2) {
          PVector steer = seek(barrier.location);
-         steer.mult(-0.3);
+         steer.mult(-0.1);
          applyForce(steer);
        }
-       else if (Math.abs(d) < barrier.diameter*1.5) {
+       else if (Math.abs(d) < barrier.diameter*1.2) {
          PVector steer = seek(barrier.location);
-         steer.mult(-0.9);
+         steer.mult(-1.0);
          applyForce(steer);
        }
        else if (Math.abs(d) < barrier.diameter) {
          PVector steer = seek(barrier.location);
-         steer.mult(-3.0);
+         steer.mult(-5.0);
          applyForce(steer);
+       }
        }
      }
    }
@@ -143,7 +146,7 @@ class Boid {
     // Draw a triangle rotated in the direction of velocity
     float theta = velocity.heading2D() + radians(90);
     // heading2D() above is now heading() but leaving old syntax until Processing.js catches up
-
+    pushStyle();
     pushMatrix();
     translate(location.x, location.y);
     rotate(theta);
@@ -152,6 +155,7 @@ class Boid {
     image(img,0,0,img.width*_scale,img.height*_scale);
     _count++;
     popMatrix();
+    popStyle();
     
   }
 
