@@ -1,7 +1,7 @@
 class Flock {
   ArrayList<Boid> boids;
   ArrayList<Barrier> barriers;
-  ArrayList<Ripple> ripples;
+  public ArrayList<Ripple> ripples;
 
   Flock() {
     boids = new ArrayList<Boid>();
