@@ -11,15 +11,15 @@ import oscP5.*;
 import netP5.*;
 
 int numRipples = 10;
-int numFlocks = 50;
+int numFlocks = 200;
 int numBarriers = 5;
-int numWagara = 5;
+int numWagara = 1;
 int interval = 0;
 String mouseMode = "PLAY";
 Boolean debug = false;
 color[] pixelBuffer;
 PGraphics pg;
-PImage img;
+PImage wagaraImg;
 Minim minim;
 AudioPlayer bgm;
 AudioPlayer seAdd;
@@ -32,32 +32,32 @@ GL2 gl;
 
 OscP5 osc;
 
-float pitch;
-float roll;
-float yaw;
-float accel;
+
+
+float[] pitch = new float[4];
+float[] roll = new float[4];
+float[] yaw = new float[4];
+float[] accel = new float[4];
 float buttonA;
 boolean useOSC = true;
 boolean useSerial = false;
-float initYaw = yaw;
-float initPitch = pitch;
-float initRoll = roll;
-float diffYaw;
-float diffPitch;
-float diffRoll;
+float[] diffAccel = new float[4];
+float[] initAccel = new float[4];
+
+PImage img;
 
 Flock flock;
 
 ArrayList <PixelArt> wagara;
 
-void setup() { 
+void setup() {
   //base setting
   size(displayWidth,displayHeight,OPENGL);
   colorMode(HSB,360,100,100);
   background(0);
-  frameRate(24);
+  frameRate(30);
   smooth();
-  noCursor();
+  //noCursor();
   
   //Serial
   if (useSerial) {
@@ -69,6 +69,7 @@ void setup() {
   //minim
   minim = new Minim(this);
   bgm = minim.loadFile("loop.mp3");
+
   //bgm.play();
   seAdd = minim.loadFile("button01a.mp3");
 
@@ -79,56 +80,65 @@ void setup() {
     flock.addBoid(new Boid(random(width),random(height),flockType));
   }
   
-  wagara = new ArrayList<PixelArt>();
-  for (int i = 0; i < numWagara; i++) {
-    PImage[] img = new PImage[4];
-    
-  }
-  
+//  wagara = new ArrayList<PixelArt>();
+//  for (int i = 0; i < numWagara; i++) {
+//    wagaraImg = loadImage("http://image.mapple.net/ocol/photol/00/00/00/18/54_120061103_1_1.jpg");
+//    wagara.add(new PixelArt(random(width),random(height),wagaraImg));
+//  }
+    float posX = width / 4;
+    float posY = height / 4;
+    flock.addBarrier(new Barrier(posX*1,posY*1,100));
+    flock.addBarrier(new Barrier(posX*3,posY*1,100));
+    flock.addBarrier(new Barrier(posX*1,posY*3,100));
+    flock.addBarrier(new Barrier(posX*3,posY*3,100));
   //OSC
   if (useOSC) {
     osc = new OscP5(this,9000);
-  
-    osc.plug(this,"pry","/wii/1/accel/pry");
-    osc.plug(this,"pitch","/wii/1/accel/pry/0");
-    osc.plug(this,"roll","/wii/1/accel/pry/1");
-    osc.plug(this,"yaw","/wii/1/accel/pry/2");
-    osc.plug(this,"accel","/wii/1/accel/pry/3");
-    osc.plug(this,"pushA","/wii/1/button/A");
+    for (int i = 1;i < 5;i++) { 
+    osc.plug(this,"pry"+i,"/wii/"+i+"/accel/pry");
+    osc.plug(this,"pitch"+i,"/wii/"+i+"/accel/pry/0");
+    osc.plug(this,"roll"+i,"/wii/"+i+"/accel/pry/1");
+    osc.plug(this,"yaw"+i,"/wii/"+i+"/accel/pry/2");
+    osc.plug(this,"accel"+i,"/wii/"+i+"/accel/pry/3");
+    osc.plug(this,"pushA"+i,"/wii/"+i+"/button/A");
+    }
   }
   //syphon
   server = new SyphonServer(this, "Processing Syphon");
 }
 
 void draw() {
+  
+  pushStyle();
   fill(0,60);
   rect(-20, -20, width+40, height+40);
+  popStyle();
   pushStyle();
   blendMode(ADD);
   //flock
   flock.run();
-  if (accel < 0.5) {
-    initYaw = yaw;
-    initPitch = pitch;
-    initRoll = roll;
-  } else {
-    diffYaw = yaw - initYaw;
-    diffPitch = pitch - initPitch;
-    diffRoll = roll - initRoll;
-    flock.pull(random(0,width), random(0,height));
-    for(int i = 0;i < numRipples ; i++) {
-      flock.addRipple(new Ripple(int(width/2 + width*diffYaw),int(height/2 - height*diffPitch),30*accel,int(random(180,200))));
-    }
-    seAdd.play();
-    seAdd.rewind();
-  }
-
+//  for (PixelArt w : wagara) {
+//    w.update();
+//    w.move(mouseX,mouseY);
+//  }
   popStyle();
-  
-  server.sendImage(g);
-  
-  println(" accel: "+accel);
 
+  server.sendImage(g);
+  if (flock.ripples.size() < numRipples ) {
+  int rippleX = int(random(width));
+  int rippleY = int(random(height));
+  flock.pull(rippleX,rippleY);
+  flock.addRipple(new Ripple(rippleX,rippleY,random(5,10),int(random(180,200))));
+  }
+  
+  for (int i = 0;i < 4;i++) { 
+    diffAccel[i] = initAccel[i] - accel[i];
+    initAccel[i] = accel[i];
+    if (abs(diffAccel[i]) > 0.05) {
+      println(" accel"+0+":"+ diffAccel[0]);
+      
+    }
+  }
 }
 
 void mousePressed() {
@@ -166,10 +176,6 @@ void keyPressed() {
       break;
   }
 }
-void debugMode() {
-
-}
-
 void serialEvent(Serial p) {
   String sensorString = port.readStringUntil('\n');
   println(sensorString);
@@ -178,6 +184,7 @@ void serialEvent(Serial p) {
 
 void drawGrid() {
   int gridSize = 10;
+  pushStyle();
   stroke(127, 127);
   strokeWeight(1);
   for (int x = 0; x < width; x+=gridSize) {
@@ -186,31 +193,32 @@ void drawGrid() {
   for (int y = 0; y < height; y+=gridSize) {
     line(0, y, width, y);
   }
+  popStyle();
 }
 
 
-PImage renderImage() {
-  fill(0,50);
-  rect(-20, -20, width+40, height+40); //fixed
-  flock.run();
-
-  loadPixels();
-  arrayCopy(pixels,pixelBuffer);
-  for (int i = 0; i < width * height; i++) {
-    pixels[i] = 0;
-  }
-  updatePixels();
-  pg.beginDraw();
-  pg.smooth();
-  pg.loadPixels();
-  for (int i = 0; i < width * height; i++) {
-    pg.pixels[i] = pixelBuffer[i];
-  }
-  pg.updatePixels();
-  pg.endDraw();
-  PImage img = pg.get(0,0,pg.width,pg.height);
-  return img;
-}
+//PImage renderImage() {
+//  fill(0,50);
+//  rect(-20, -20, width+40, height+40); //fixed
+//  flock.run();
+//
+//  loadPixels();
+//  arrayCopy(pixels,pixelBuffer);
+//  for (int i = 0; i < width * height; i++) {
+//    pixels[i] = 0;
+//  }
+//  updatePixels();
+//  pg.beginDraw();
+//  pg.smooth();
+//  pg.loadPixels();
+//  for (int i = 0; i < width * height; i++) {
+//    pg.pixels[i] = pixelBuffer[i];
+//  }
+//  pg.updatePixels();
+//  pg.endDraw();
+//  PImage img = pg.get(0,0,pg.width,pg.height);
+//  return img;
+//}
 
 void stop() {
   bgm.close();
@@ -218,13 +226,27 @@ void stop() {
   super.stop();
 }
 
-void pry(float _pitch, float _roll, float _yaw, float _accel) {
-  pitch = -1 * (_pitch - 0.5);
-  roll = _roll - 0.5;
-  yaw = _yaw - 0.5;
-  accel = _accel;
+void pry1(float _pitch, float _roll, float _yaw, float _accel) {
+  pitch[0]= -1 * (_pitch - 0.5);
+  roll[0] = _roll - 0.5;
+  yaw[0] = _yaw - 0.5;
+  accel[0] = _accel;
 }
-
-void remoteRipple(float _pitch,float _roll, float _yaw, float _accel) {
-
+void pry2(float _pitch, float _roll, float _yaw, float _accel) {
+  pitch[1]= -1 * (_pitch - 0.5);
+  roll[1] = _roll - 0.5;
+  yaw[1] = _yaw - 0.5;
+  accel[1] = _accel;
+}
+void pry3(float _pitch, float _roll, float _yaw, float _accel) {
+  pitch[2]= -1 * (_pitch - 0.5);
+  roll[2] = _roll - 0.5;
+  yaw[2] = _yaw - 0.5;
+  accel[2] = _accel;
+}
+void pry4(float _pitch, float _roll, float _yaw, float _accel) {
+  pitch[3]= -1 * (_pitch - 0.5);
+  roll[3] = _roll - 0.5;
+  yaw[3] = _yaw - 0.5;
+  accel[3] = _accel;
 }
