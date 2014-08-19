@@ -12,7 +12,7 @@ class Boid {
   float maxforce;    // Maximum steering force
   float maxspeed;    // Maximum speed
   
-  ArrayList<Emitter> emitter = new ArrayList <Emitter>();; 
+  //ArrayList<Emitter> emitter = new ArrayList <Emitter>();; 
 
   Boid(float x, float y, int type) {
     for (int i = 0; i < 4; i++) {
@@ -30,7 +30,7 @@ class Boid {
     maxforce = 0.03;
     _scale = random(0.3,1.5);
     
-    emitter.add(new Emitter(location.x,location.y));
+    //emitter.add(new Emitter(location.x,location.y));
   }
 
   void run(ArrayList<Boid> boids) {
@@ -38,11 +38,11 @@ class Boid {
     update();
     borders();
     render();
-    for(int i = 0; i < emitter.size(); i++) {
-       Emitter e = emitter.get(i);
-       e.move(location.x,location.y);
-       e.update();
-    }
+//    for(int i = 0; i < emitter.size(); i++) {
+//       Emitter e = emitter.get(i);
+//       e.move(location.x,location.y);
+//       e.update();
+//    }
   }
 
   void pull(ArrayList<Boid> boids,float x,float y) {
@@ -104,9 +104,9 @@ class Boid {
     PVector ali = align(boids);      // Alignment
     PVector coh = cohesion(boids);   // Cohesion
     // Arbitrarily weight these forces
-    sep.mult(1.5);
-    ali.mult(1.0);
-    coh.mult(1.0);
+    sep.mult(10);
+    ali.mult(5);
+    coh.mult(0.1);
 
     applyForce(sep);
     applyForce(ali);

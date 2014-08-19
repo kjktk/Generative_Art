@@ -32,4 +32,7 @@ class Barrier {
   void sound() {
     is_sound = true;
   }
+  void move(float _x, float _y) {
+    
+  }
 }

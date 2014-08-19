@@ -16,7 +16,7 @@ class Flock {
       b.push(boids,barriers);
     }
     for (Ripple r : ripples) {
-      r.run(ripples);
+      r.run();
     }
     for (Barrier b : barriers) {
       b.run(barriers);
@@ -37,6 +37,9 @@ class Flock {
     for (Boid b : boids) {
       b.pull(boids,x,y);
     }
+  }
+  ArrayList<Barrier> getBarriers() {
+    return barriers;
   }
 }
 
