@@ -40,22 +40,22 @@ class Particle
     x += speed*dist*cos(direction) / 100;
     y += speed*dist*sin(direction) / 100;
     speed *= FRICTION;
-    if(speed < 1.0){
+    if(speed < 0.5){
       flag = false;
     }
   }
   void init() {
-    move(initX,initY);
+    pull(initX,initY);
   }
   void draw(){
     pushStyle();
     colorMode(HSB);
-    noStroke();
-    fill(colorH, 100, 100, 100*speed/3);
+    noFill();
+    stroke(colorH, 100, 100, 100*speed/3);
     ellipse(x,y, size, size);
-    fill(colorH, 70, 100, 100*speed/3);
-    ellipse(x  -5,y -5, size * 0.8, size *0.8);
-    ellipse(x + 5,y + 5, size * 0.8, size *0.8);
+    stroke(colorH, 70, 100, 100*speed/3);
+    ellipse(x  + random(-2),y + random(-2), size * 0.8, size *0.8);
+    ellipse(x + random(2),y + random(2), size * 0.8, size *0.8);
     popStyle();
   }
   void explode() {
