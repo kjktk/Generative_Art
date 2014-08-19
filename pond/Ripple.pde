@@ -6,6 +6,7 @@ public class Ripple{
   float speed;
   int colorH;   
   boolean flag = false;
+  AudioSnippet mizuSE;
   
   Ripple(int _x,int _y, float _speed, int _colorH){
     x = _x;
@@ -14,18 +15,20 @@ public class Ripple{
     colorH = _colorH + int(random(-20,20));
     dia = 0.0;
     flag = true;
+    mizuSE = minim.loadSnippet("mizu_"+int(random(3))+".mp3");
   }
   
-  void run(ArrayList<Ripple> ripples) {
+  void run() {
     if (flag == true) {
       rippleDraw();
       move();
+      mizuSE.play();
     }
   }
   
   void rippleDraw(){
+    pushStyle();
     noFill();
-    
     if(speed > 1.0){
       stroke(colorH, 90, 95, 100*(speed-1)/3);
       strokeWeight(2);
@@ -44,6 +47,7 @@ public class Ripple{
       stroke(colorH, 90, 95, 100*(speed-3)/3);
       ellipse(x + random(-100,100), y + random(-100,100), dia *0.3, dia *0.3);
     }
+    popStyle();
   }
   
   void move(){
