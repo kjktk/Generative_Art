@@ -11,10 +11,11 @@ import oscP5.*;
 import netP5.*;
 
 int numRipples = 10;
-int numFlocks = 200;
+int numFlocks = 300;
 int numBarriers = 5;
 int numWagara = 1;
 int interval = 0;
+int timer = 10;
 String mouseMode = "PLAY";
 Boolean debug = false;
 color[] pixelBuffer;
@@ -32,8 +33,6 @@ GL2 gl;
 
 OscP5 osc;
 
-
-
 float[] pitch = new float[4];
 float[] roll = new float[4];
 float[] yaw = new float[4];
@@ -50,6 +49,12 @@ Flock flock;
 
 ArrayList <PixelArt> wagara;
 ArrayList <Ripple> ripples;
+ArrayList <Net> nets;
+
+boolean gameStart = false;
+boolean result = false;
+
+int _frameCount = 0;
 
 void setup() {
   //base setting
@@ -76,11 +81,11 @@ void setup() {
 
   //flock
   flock = new Flock();
-  for (int i = 0; i < numFlocks; i++) {
+  for (int i = 0; i < 20; i++) {
     int flockType = Math.round(random(3, 4));
     flock.addBoid(new Boid(random(width), random(height), flockType));
   }
-
+  nets = new ArrayList<Net>();
   ripples = new ArrayList<Ripple>();
 
   //  wagara = new ArrayList<PixelArt>();
@@ -88,27 +93,24 @@ void setup() {
   //    wagaraImg = loadImage("http://image.mapple.net/ocol/photol/00/00/00/18/54_120061103_1_1.jpg");
   //    wagara.add(new PixelArt(random(width),random(height),wagaraImg));
   //  }
-//  float posX = width / 4;
-//  float posY = height / 4;
-//  flock.addBarrier(new Barrier(posX*1, posY*1, 100));
-//  flock.addBarrier(new Barrier(posX*3, posY*1, 100));
-//  flock.addBarrier(new Barrier(posX*1, posY*3, 100));
-//  flock.addBarrier(new Barrier(posX*3, posY*3, 100));
-  
-  flock.addBarrier(new Barrier(-height, height/2, height/2));
-  flock.addBarrier(new Barrier(width+height, height/2, height/2));
-  flock.addBarrier(new Barrier(width/ 2, -width, width/2));
-  flock.addBarrier(new Barrier(width/ 2, height + width, width/2));
+  float posX = width / 4;
+  float posY = height / 4;
+  nets.add(new Net(posX*1, posY*1, 100, 0));
+  nets.add(new Net(posX*3, posY*1, 100, 90));
+  nets.add(new Net(posX*1, posY*3, 100, 180));
+  nets.add(new Net(posX*3, posY*3, 100, 270));
+
   //OSC
   if (useOSC) {
     osc = new OscP5(this, 9000);
     for (int i = 1; i < 5; i++) { 
       osc.plug(this, "pry"+i, "/wii/"+i+"/accel/pry");
-      osc.plug(this, "pitch"+i, "/wii/"+i+"/accel/pry/0");
-      osc.plug(this, "roll"+i, "/wii/"+i+"/accel/pry/1");
-      osc.plug(this, "yaw"+i, "/wii/"+i+"/accel/pry/2");
-      osc.plug(this, "accel"+i, "/wii/"+i+"/accel/pry/3");
-      osc.plug(this, "pushA"+i, "/wii/"+i+"/button/A");
+      osc.plug(this, "accel"+i, "/wii/"+i+"/accel/xyz");
+      //      osc.plug(this, "pitch"+i, "/wii/"+i+"/accel/pry/0");
+      //      osc.plug(this, "roll"+i, "/wii/"+i+"/accel/pry/1");
+      //      osc.plug(this, "yaw"+i, "/wii/"+i+"/accel/pry/2");
+      //      osc.plug(this, "accel"+i, "/wii/"+i+"/accel/pry/3");
+      osc.plug(this, "buttonA"+i, "/wii/"+i+"/button/A");
     }
   }
   //syphon
@@ -116,52 +118,86 @@ void setup() {
 }
 
 void draw() {
+  println(_frameCount);
+  if (gameStart) {
+    pushStyle();
+    fill(0, 10);
+    rect(-20, -20, width+40, height+40);
+    popStyle();
 
-  pushStyle();
-  fill(0, 10);
-  rect(-20, -20, width+40, height+40);
-  popStyle();
-  pushStyle();
-  blendMode(ADD);
-  //flock
-  flock.run();
-  //  for (PixelArt w : wagara) {
-  //    w.update();
-  //    w.move(mouseX,mouseY);
-  //  }
+    pushStyle();
+    blendMode(ADD);
+    //flock
+    flock.run();
 
-  for (int i = 0; i < ripples.size(); i++) {
-    Ripple r = ripples.get(i);
-    r.run();
-    if (r.flag = false) {
-      ripples.remove(i);
-    }
-  }
-  if (frameCount % 30 == int(random(2))) {
-    int rippleX = int(random(200,width - 200));
-    int rippleY = int(random(200,height - 200));
-    flock.pull(rippleX, rippleY);
-    ripples.add(new Ripple(rippleX, rippleY, random(5, 10), int(random(180, 200))));
-  }
-
-  for (int i = 0; i < 4; i++) { 
-    diffAccel[i] = initAccel[i] - accel[i];
-    initAccel[i] = accel[i];
-    if (abs(diffAccel[i]) > 0.05) {
+    //  for (PixelArt w : wagara) {
+    //    w.update();
+    //    w.move(mouseX,mouseY);
+    //  }
+    for (int i = 0; i < nets.size (); i++) {
+      Net n = nets.get(i);
+      n.run();
+      //n.move(width/2 + width*roll[i],height/2 + height*pitch[i]);
+      diffAccel[i] = initAccel[i] - accel[i];
+      initAccel[i] = accel[i];
       println(" accel"+0+":"+ diffAccel[0]);
+      if (abs(diffAccel[i]) > 0.1) {
+        n.catchCarp(flock.boids);
+      }
     }
+    for (int i = 0; i < ripples.size (); i++) {
+      Ripple r = ripples.get(i);
+      r.run();
+      if (r.flag = false) {
+        ripples.remove(i);
+      }
+    }
+    if (frameCount % 30 == int(random(2))) {
+      if (flock.boids.size() < numFlocks) {
+        for (int i = 0; i < int (random (10)); i++) {
+          int flockType = Math.round(random(3, 4));
+          flock.addBoid(new Boid(random(width), random(height), flockType));
+        }
+      }
+      int rippleX = int(random(200, width - 200));
+      int rippleY = int(random(200, height - 200));
+      flock.pull(rippleX, rippleY);
+      ripples.add(new Ripple(rippleX, rippleY, random(5, 10), int(random(180, 200))));
+    }
+    if (_frameCount > timer*30) {
+      gameStart = false;
+      result = true;
+      _frameCount = 0;
+    }
+    popStyle();
+    _frameCount++;
+  } else if (result) {
+    pushStyle();
+    fill(255);
+    textAlign(CENTER);
+    PFont myFont = loadFont("HiraMinPro-W6-48.vlw");
+    textFont(myFont);
+    text("Result", width/2, height/2);
+    fill(0, 10);
+    rect(-20, -20, width+40, height+40);
+    popStyle();
+  } else {
+    pushStyle();
+    fill(255);
+    textAlign(CENTER);
+    PFont myFont = loadFont("HiraMinPro-W6-48.vlw");
+    textFont(myFont);
+    text("Title", width/2, height/2);
+    fill(0, 10);
+    rect(-20, -20, width+40, height+40);
+    popStyle();
   }
-  popStyle();
-
   server.sendImage(g);
 }
 
 void mousePressed() {
   if ( mouseMode == "PLAY" ) {
     flock.pull(mouseX, mouseY);
-
-    seAdd.play();
-    seAdd.rewind();
   } else if ( mouseMode == "ADD" ) {
     int flockType = Math.round(random(0, 4));
     flock.addBoid(new Boid(mouseX, mouseY, flockType));
@@ -204,6 +240,27 @@ void drawGrid() {
   popStyle();
 }
 
+PImage titleImage() {
+  fill(0, 50);
+  rect(-20, -20, width+40, height+40); //fixed
+
+  loadPixels();
+  arrayCopy(pixels, pixelBuffer);
+  for (int i = 0; i < width * height; i++) {
+    pixels[i] = 0;
+  }
+  updatePixels();
+  pg.beginDraw();
+  pg.smooth();
+  pg.loadPixels();
+  for (int i = 0; i < width * height; i++) {
+    pg.pixels[i] = pixelBuffer[i];
+  }
+  pg.updatePixels();
+  pg.endDraw();
+  PImage img = pg.get(0, 0, pg.width, pg.height);
+  return img;
+}
 
 PImage renderImage() {
   fill(0, 50);
@@ -233,6 +290,11 @@ void stop() {
   minim.stop();
   super.stop();
 }
+void accel1(float _x, float _y, float _z) {
+  //  println("x:"+ _x);
+  //  println("y:"+ _y);
+  //  println("z:"+ _z);
+}
 
 void pry1(float _pitch, float _roll, float _yaw, float _accel) {
   pitch[0]= -1 * (_pitch - 0.5);
@@ -257,5 +319,26 @@ void pry4(float _pitch, float _roll, float _yaw, float _accel) {
   roll[3] = _roll - 0.5;
   yaw[3] = _yaw - 0.5;
   accel[3] = _accel;
+}
+
+void buttonA1(float _value) {
+  if (_value > 0) {
+    gameStart = true;
+  }
+}
+void buttonA2(float _value) {
+  if (_value > 0) {
+    gameStart = true;
+  }
+}
+void buttonA3(float _value) {
+  if (_value > 0) {
+    gameStart = true;
+  }
+}
+void buttonA4(float _value) {
+  if (_value > 0) {
+    gameStart = true;
+  }
 }
 
