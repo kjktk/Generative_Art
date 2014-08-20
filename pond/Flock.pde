@@ -1,45 +1,33 @@
 class Flock {
-  ArrayList<Boid> boids;
-  ArrayList<Barrier> barriers;
-  public ArrayList<Ripple> ripples;
+  public ArrayList<Boid> boids;
+  public ArrayList<Barrier> barriers;
+
 
   Flock() {
     boids = new ArrayList<Boid>();
-    ripples = new ArrayList<Ripple>();
     barriers = new ArrayList<Barrier>();
   }
 
   void run() {
     for (Boid b : boids) {
       b.run(boids);
-      
-      b.push(boids,barriers);
-    }
-    for (Ripple r : ripples) {
-      r.run();
+      b.push(boids, barriers);
     }
     for (Barrier b : barriers) {
-      b.run(barriers);
+      b.run();
     }
   }
 
   void addBoid(Boid b) {
     boids.add(b);
   }
-
-  void addRipple(Ripple r) {
-    ripples.add(r);
-  }
   void addBarrier(Barrier b) {
     barriers.add(b);
   }
-  void pull(float x,float y) {
+  void pull(float x, float y) {
     for (Boid b : boids) {
-      b.pull(boids,x,y);
+      b.pull(boids, x, y);
     }
-  }
-  ArrayList<Barrier> getBarriers() {
-    return barriers;
   }
 }
 
