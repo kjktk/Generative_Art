@@ -49,16 +49,17 @@ PImage img;
 Flock flock;
 
 ArrayList <PixelArt> wagara;
+ArrayList <Ripple> ripples;
 
 void setup() {
   //base setting
-  size(displayWidth,displayHeight,OPENGL);
-  colorMode(HSB,360,100,100);
+  size(displayWidth, displayHeight, OPENGL);
+  colorMode(HSB, 360, 100, 100);
   background(0);
   frameRate(30);
   smooth();
   //noCursor();
-  
+
   //Serial
   if (useSerial) {
     println(Serial.list());
@@ -70,37 +71,42 @@ void setup() {
   minim = new Minim(this);
   bgm = minim.loadFile("loop.mp3");
 
-  //bgm.play();
+  bgm.loop();
   seAdd = minim.loadFile("button01a.mp3");
 
   //flock
   flock = new Flock();
   for (int i = 0; i < numFlocks; i++) {
-    int flockType = Math.round(random(3,4));
-    flock.addBoid(new Boid(random(width),random(height),flockType));
+    int flockType = Math.round(random(3, 4));
+    flock.addBoid(new Boid(random(width), random(height), flockType));
   }
+
+  ripples = new ArrayList<Ripple>();
+
+  //  wagara = new ArrayList<PixelArt>();
+  //  for (int i = 0; i < numWagara; i++) {
+  //    wagaraImg = loadImage("http://image.mapple.net/ocol/photol/00/00/00/18/54_120061103_1_1.jpg");
+  //    wagara.add(new PixelArt(random(width),random(height),wagaraImg));
+  //  }
+  float posX = width / 4;
+  float posY = height / 4;
+  flock.addBarrier(new Barrier(posX*1, posY*1, 100));
+  flock.addBarrier(new Barrier(posX*3, posY*1, 100));
+  flock.addBarrier(new Barrier(posX*1, posY*3, 100));
+  flock.addBarrier(new Barrier(posX*3, posY*3, 100));
   
-//  wagara = new ArrayList<PixelArt>();
-//  for (int i = 0; i < numWagara; i++) {
-//    wagaraImg = loadImage("http://image.mapple.net/ocol/photol/00/00/00/18/54_120061103_1_1.jpg");
-//    wagara.add(new PixelArt(random(width),random(height),wagaraImg));
-//  }
-    float posX = width / 4;
-    float posY = height / 4;
-    flock.addBarrier(new Barrier(posX*1,posY*1,100));
-    flock.addBarrier(new Barrier(posX*3,posY*1,100));
-    flock.addBarrier(new Barrier(posX*1,posY*3,100));
-    flock.addBarrier(new Barrier(posX*3,posY*3,100));
+  flock.addBarrier(new Barrier(-height, height/2, height/2));
+  flock.addBarrier(new Barrier(width+height, height/2, height/2));
   //OSC
   if (useOSC) {
-    osc = new OscP5(this,9000);
-    for (int i = 1;i < 5;i++) { 
-    osc.plug(this,"pry"+i,"/wii/"+i+"/accel/pry");
-    osc.plug(this,"pitch"+i,"/wii/"+i+"/accel/pry/0");
-    osc.plug(this,"roll"+i,"/wii/"+i+"/accel/pry/1");
-    osc.plug(this,"yaw"+i,"/wii/"+i+"/accel/pry/2");
-    osc.plug(this,"accel"+i,"/wii/"+i+"/accel/pry/3");
-    osc.plug(this,"pushA"+i,"/wii/"+i+"/button/A");
+    osc = new OscP5(this, 9000);
+    for (int i = 1; i < 5; i++) { 
+      osc.plug(this, "pry"+i, "/wii/"+i+"/accel/pry");
+      osc.plug(this, "pitch"+i, "/wii/"+i+"/accel/pry/0");
+      osc.plug(this, "roll"+i, "/wii/"+i+"/accel/pry/1");
+      osc.plug(this, "yaw"+i, "/wii/"+i+"/accel/pry/2");
+      osc.plug(this, "accel"+i, "/wii/"+i+"/accel/pry/3");
+      osc.plug(this, "pushA"+i, "/wii/"+i+"/button/A");
     }
   }
   //syphon
@@ -108,79 +114,79 @@ void setup() {
 }
 
 void draw() {
-  
+
   pushStyle();
-  fill(0,60);
+  fill(0, 10);
   rect(-20, -20, width+40, height+40);
   popStyle();
   pushStyle();
   blendMode(ADD);
   //flock
   flock.run();
-//  for (PixelArt w : wagara) {
-//    w.update();
-//    w.move(mouseX,mouseY);
-//  }
-  popStyle();
+  //  for (PixelArt w : wagara) {
+  //    w.update();
+  //    w.move(mouseX,mouseY);
+  //  }
 
-  server.sendImage(g);
-  if (flock.ripples.size() < numRipples ) {
-  int rippleX = int(random(width));
-  int rippleY = int(random(height));
-  flock.pull(rippleX,rippleY);
-  flock.addRipple(new Ripple(rippleX,rippleY,random(5,10),int(random(180,200))));
+  for (int i = 0; i < ripples.size(); i++) {
+    Ripple r = ripples.get(i);
+    r.run();
+    if (r.flag = false) {
+      ripples.remove(i);
+    }
   }
-  
-  for (int i = 0;i < 4;i++) { 
+  if (frameCount % 30 == int(random(2))) {
+    int rippleX = int(random(200,width - 200));
+    int rippleY = int(random(200,height - 200));
+    flock.pull(rippleX, rippleY);
+    ripples.add(new Ripple(rippleX, rippleY, random(5, 10), int(random(180, 200))));
+  }
+
+  for (int i = 0; i < 4; i++) { 
     diffAccel[i] = initAccel[i] - accel[i];
     initAccel[i] = accel[i];
     if (abs(diffAccel[i]) > 0.05) {
       println(" accel"+0+":"+ diffAccel[0]);
-      
     }
   }
+  popStyle();
+
+  server.sendImage(g);
 }
 
 void mousePressed() {
-  if( mouseMode == "PLAY" ) {
-    flock.pull(mouseX,mouseY);
-    for(int i = 0;i < numRipples ; i++) {
-      flock.addRipple(new Ripple(mouseX,mouseY,random(5,10),int(random(180,200))));
-    }
-    
-    seAdd.play();
-    seAdd.rewind();
-  }
-  else if ( mouseMode == "ADD" ) {
-    int flockType = Math.round(random(0,4));
-    flock.addBoid(new Boid(mouseX,mouseY,flockType));
-    seAdd.play();
-    seAdd.rewind();
+  if ( mouseMode == "PLAY" ) {
+    flock.pull(mouseX, mouseY);
 
-  }
-  else if ( mouseMode == "BARRIER" ) {
-    flock.addBarrier(new Barrier(mouseX,mouseY,random(90)));
+    seAdd.play();
+    seAdd.rewind();
+  } else if ( mouseMode == "ADD" ) {
+    int flockType = Math.round(random(0, 4));
+    flock.addBoid(new Boid(mouseX, mouseY, flockType));
+    seAdd.play();
+    seAdd.rewind();
+  } else if ( mouseMode == "BARRIER" ) {
+    flock.addBarrier(new Barrier(mouseX, mouseY, random(90)));
   }
 }
 
 void keyPressed() {
   switch(key) {
-    case 1:
-      mouseMode = "PLAY";
-      break;
-    case 2:
-      mouseMode = "ADD";
-      break;
-    case 3:
-      mouseMode = "BARRIER";
-      break;
+  case 1:
+    mouseMode = "PLAY";
+    break;
+  case 2:
+    mouseMode = "ADD";
+    break;
+  case 3:
+    mouseMode = "BARRIER";
+    break;
   }
 }
 void serialEvent(Serial p) {
   String sensorString = port.readStringUntil('\n');
   println(sensorString);
 }
-
 
 void drawGrid() {
   int gridSize = 10;
@@ -197,28 +203,28 @@ void drawGrid() {
 }
 
 
-//PImage renderImage() {
-//  fill(0,50);
-//  rect(-20, -20, width+40, height+40); //fixed
-//  flock.run();
-//
-//  loadPixels();
-//  arrayCopy(pixels,pixelBuffer);
-//  for (int i = 0; i < width * height; i++) {
-//    pixels[i] = 0;
-//  }
-//  updatePixels();
-//  pg.beginDraw();
-//  pg.smooth();
-//  pg.loadPixels();
-//  for (int i = 0; i < width * height; i++) {
-//    pg.pixels[i] = pixelBuffer[i];
-//  }
-//  pg.updatePixels();
-//  pg.endDraw();
-//  PImage img = pg.get(0,0,pg.width,pg.height);
-//  return img;
-//}
+PImage renderImage() {
+  fill(0, 50);
+  rect(-20, -20, width+40, height+40); //fixed
+  flock.run();
+
+  loadPixels();
+  arrayCopy(pixels, pixelBuffer);
+  for (int i = 0; i < width * height; i++) {
+    pixels[i] = 0;
+  }
+  updatePixels();
+  pg.beginDraw();
+  pg.smooth();
+  pg.loadPixels();
+  for (int i = 0; i < width * height; i++) {
+    pg.pixels[i] = pixelBuffer[i];
+  }
+  pg.updatePixels();
+  pg.endDraw();
+  PImage img = pg.get(0, 0, pg.width, pg.height);
+  return img;
+}
 
 void stop() {
   bgm.close();
@@ -250,3 +256,4 @@ void pry4(float _pitch, float _roll, float _yaw, float _accel) {
   yaw[3] = _yaw - 0.5;
   accel[3] = _accel;
 }
+
