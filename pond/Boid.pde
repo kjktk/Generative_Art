@@ -2,17 +2,18 @@ class Boid {
   int _count = 0;
   float _scale = 1;
   PImage[] imgs = new PImage[4];
-  String[] imgNames = new String[]{
-     "carp1","carp","carp4","carp3","carp2"
+  String[] imgNames = new String[] {
+    "carp1", "carp", "carp4", "carp3", "carp2"
   };
-  PVector location;
-  PVector velocity;
+  public PVector location;
+  public PVector velocity;
   PVector acceleration;
   float r;
   float maxforce;    // Maximum steering force
   float maxspeed;    // Maximum speed
-  
-  //ArrayList<Emitter> emitter = new ArrayList <Emitter>();; 
+  boolean is_catch;
+
+  ArrayList<Emitter> emitter = new ArrayList <Emitter>();
 
   Boid(float x, float y, int type) {
     for (int i = 0; i < 4; i++) {
@@ -26,11 +27,11 @@ class Boid {
 
     location = new PVector(x, y);
     r = 100;
-    maxspeed = 4;
+    maxspeed = 3;
     maxforce = 0.03;
-    _scale = random(0.3,1.5);
-    
-    //emitter.add(new Emitter(location.x,location.y));
+    _scale = random(0.2, 1.5);
+
+    is_catch = false;
   }
 
   void run(ArrayList<Boid> boids) {
@@ -38,60 +39,56 @@ class Boid {
     update();
     borders();
     render();
-//    for(int i = 0; i < emitter.size(); i++) {
-//       Emitter e = emitter.get(i);
-//       e.move(location.x,location.y);
-//       e.update();
-//    }
+    for (int i = 0; i < emitter.size (); i++) {
+      Emitter e = emitter.get(i);
+      e.move(location.x, location.y);
+      e.update();
+    }
   }
 
-  void pull(ArrayList<Boid> boids,float x,float y) {
-    PVector mouse = new PVector(x,y);
+  void pull(ArrayList<Boid> boids, float x, float y) {
+    PVector mouse = new PVector(x, y);
     for (Boid n : boids) {
-      float d = PVector.dist(location,mouse);
+      float d = PVector.dist(location, mouse);
       if (Math.abs(d) < 200) {
-          PVector steer = seek(mouse);
-          steer.mult(0.3);
-          applyForce(steer);
+        PVector steer = seek(mouse);
+        steer.mult(0.3);
+        applyForce(steer);
       }
       if (Math.abs(d) < 100) {
-          PVector steer = seek(mouse);
-          steer.mult(0.5);
-          applyForce(steer);
+        PVector steer = seek(mouse);
+        steer.mult(0.5);
+        applyForce(steer);
       }
     }
   }
 
- void push(ArrayList<Boid> boids,ArrayList<Barrier> barriers) {
-   
-   PVector sum = new PVector(0, 0);
-   for (Boid n : boids) {
-     for (Barrier barrier : barriers) {
-       if (barrier.is_push) {
-       float d = PVector.dist(location, barrier.location);
-       if (Math.abs(d) < barrier.diameter*3) {
-         PVector steer = seek(barrier.location);
-         steer.mult(-0.05);
-         applyForce(steer);
-       }
-       else if (Math.abs(d) < barrier.diameter*2) {
-         PVector steer = seek(barrier.location);
-         steer.mult(-0.1);
-         applyForce(steer);
-       }
-       else if (Math.abs(d) < barrier.diameter*1.2) {
-         PVector steer = seek(barrier.location);
-         steer.mult(-1.0);
-         applyForce(steer);
-       }
-       else if (Math.abs(d) < barrier.diameter) {
-         PVector steer = seek(barrier.location);
-         steer.mult(-5.0);
-         applyForce(steer);
-       }
-       }
-     }
-   }
+  void push(ArrayList<Boid> boids, ArrayList<Barrier> barriers) {
+    PVector sum = new PVector(0, 0);
+    for (Boid n : boids) {
+      for (Barrier barrier : barriers) {
+        if (barrier.is_push) {
+          float d = PVector.dist(location, barrier.location);
+          if (Math.abs(d) < barrier.diameter*3) {
+            PVector steer = seek(barrier.location);
+            steer.mult(-0.05);
+            applyForce(steer);
+          } else if (Math.abs(d) < barrier.diameter*2) {
+            PVector steer = seek(barrier.location);
+            steer.mult(-0.1);
+            applyForce(steer);
+          } else if (Math.abs(d) < barrier.diameter*1.2) {
+            PVector steer = seek(barrier.location);
+            steer.mult(-1.0);
+            applyForce(steer);
+          } else if (Math.abs(d) < barrier.diameter) {
+            PVector steer = seek(barrier.location);
+            steer.mult(-5.0);
+            applyForce(steer);
+          }
+        }
+      }
+    }
   }
 
   void applyForce(PVector force) {
@@ -104,8 +101,8 @@ class Boid {
     PVector ali = align(boids);      // Alignment
     PVector coh = cohesion(boids);   // Cohesion
     // Arbitrarily weight these forces
-    sep.mult(10);
-    ali.mult(5);
+    sep.mult(20);
+    ali.mult(1.0);
     coh.mult(0.1);
 
     applyForce(sep);
@@ -150,13 +147,18 @@ class Boid {
     pushMatrix();
     translate(location.x, location.y);
     rotate(theta);
-    PImage img = imgs[_count / 5 % imgs.length];
-    tint(0,0,100,random(150,200));
-    image(img,0,0,img.width*_scale,img.height*_scale);
-    _count++;
+    if (is_catch) {
+      PImage img = imgs[0];
+      tint(0, 0, 100, 100);
+      image(img, -img.width*_scale/2, -img.height*_scale/2, img.width*_scale*1.5, img.height*_scale*1.5);
+    } else {
+      PImage img = imgs[_count / 5 % imgs.length];
+      tint(0, 0, 100, random(20, 30));
+      image(img, -img.width*_scale/2, -img.height*_scale/2, img.width*_scale, img.height*_scale);
+      _count++;
+    }
     popMatrix();
     popStyle();
-    
   }
 
   void borders() {
@@ -225,8 +227,7 @@ class Boid {
       PVector steer = PVector.sub(sum, velocity);
       steer.limit(maxforce);
       return steer;
-    }
-    else {
+    } else {
       return new PVector(0, 0);
     }
   }
@@ -245,10 +246,14 @@ class Boid {
     if (count > 0) {
       sum.div(count);
       return seek(sum);
-    }
-    else {
+    } else {
       return new PVector(0, 0);
     }
+  }
+  void catchBoid () {
+    velocity.set(0, 0);
+    emitter.add(new Emitter(location.x, location.y));
+    is_catch = true;
   }
 }
 
