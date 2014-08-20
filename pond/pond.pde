@@ -88,15 +88,17 @@ void setup() {
   //    wagaraImg = loadImage("http://image.mapple.net/ocol/photol/00/00/00/18/54_120061103_1_1.jpg");
   //    wagara.add(new PixelArt(random(width),random(height),wagaraImg));
   //  }
-  float posX = width / 4;
-  float posY = height / 4;
-  flock.addBarrier(new Barrier(posX*1, posY*1, 100));
-  flock.addBarrier(new Barrier(posX*3, posY*1, 100));
-  flock.addBarrier(new Barrier(posX*1, posY*3, 100));
-  flock.addBarrier(new Barrier(posX*3, posY*3, 100));
+//  float posX = width / 4;
+//  float posY = height / 4;
+//  flock.addBarrier(new Barrier(posX*1, posY*1, 100));
+//  flock.addBarrier(new Barrier(posX*3, posY*1, 100));
+//  flock.addBarrier(new Barrier(posX*1, posY*3, 100));
+//  flock.addBarrier(new Barrier(posX*3, posY*3, 100));
   
   flock.addBarrier(new Barrier(-height, height/2, height/2));
   flock.addBarrier(new Barrier(width+height, height/2, height/2));
+  flock.addBarrier(new Barrier(width/ 2, -width, width/2));
+  flock.addBarrier(new Barrier(width/ 2, height + width, width/2));
   //OSC
   if (useOSC) {
     osc = new OscP5(this, 9000);
