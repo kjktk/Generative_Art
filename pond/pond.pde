@@ -27,7 +27,7 @@ AudioPlayer seAdd;
 SyphonServer server;
 Serial port;
 
-PShape s;
+PShape logo;
 
 GL2 gl;
 
@@ -43,6 +43,8 @@ boolean useSerial = false;
 float[] diffAccel = new float[4];
 float[] initAccel = new float[4];
 
+
+
 PImage img;
 
 Flock flock;
@@ -53,8 +55,19 @@ ArrayList <Net> nets;
 
 boolean gameStart = false;
 boolean result = false;
+boolean question = false;
+boolean title = true;
+
+boolean[] button1 = new boolean[4];
+boolean[] button2 = new boolean[4];
+
+boolean[] answerFlag = new boolean[4];
+boolean[] enjoyFlag = new boolean[4];
+boolean answer = false;
 
 int _frameCount = 0;
+
+PFont myFont = createFont("HiraMinPro-W6",50);
 
 void setup() {
   //base setting
@@ -106,19 +119,18 @@ void setup() {
     for (int i = 1; i < 5; i++) { 
       osc.plug(this, "pry"+i, "/wii/"+i+"/accel/pry");
       osc.plug(this, "accel"+i, "/wii/"+i+"/accel/xyz");
-      //      osc.plug(this, "pitch"+i, "/wii/"+i+"/accel/pry/0");
-      //      osc.plug(this, "roll"+i, "/wii/"+i+"/accel/pry/1");
-      //      osc.plug(this, "yaw"+i, "/wii/"+i+"/accel/pry/2");
-      //      osc.plug(this, "accel"+i, "/wii/"+i+"/accel/pry/3");
       osc.plug(this, "buttonA"+i, "/wii/"+i+"/button/A");
+      osc.plug(this, "button1"+i, "/wii/"+i+"/button/A");
+      osc.plug(this, "button2"+i, "/wii/"+i+"/button/A");
     }
   }
+
+  logo = loadShape("logo.svg");
   //syphon
   server = new SyphonServer(this, "Processing Syphon");
 }
 
 void draw() {
-  println(_frameCount);
   if (gameStart) {
     pushStyle();
     fill(0, 10);
@@ -140,7 +152,7 @@ void draw() {
       //n.move(width/2 + width*roll[i],height/2 + height*pitch[i]);
       diffAccel[i] = initAccel[i] - accel[i];
       initAccel[i] = accel[i];
-      println(" accel"+0+":"+ diffAccel[0]);
+      //println(" accel"+0+":"+ diffAccel[0]);
       if (abs(diffAccel[i]) > 0.1) {
         n.catchCarp(flock.boids);
       }
@@ -173,21 +185,58 @@ void draw() {
     _frameCount++;
   } else if (result) {
     pushStyle();
-    fill(255);
     textAlign(CENTER);
-    PFont myFont = loadFont("HiraMinPro-W6-48.vlw");
     textFont(myFont);
-    text("Result", width/2, height/2);
+    for (int i = 0; i < nets.size (); i++) {
+      Net n = nets.get(i);
+      fill(90*i, 50, 100);
+      text(n.score, width/2, height/5 * (i +1));
+    }
+    fill(0, 100);
+    rect(-20, -20, width+40, height+40);
+    popStyle();
+    if (_frameCount > timer*10) {
+      result = false;
+      question = true;
+      _frameCount = 0;
+    }
+    _frameCount++;
+  } else if (question) {
+    pushStyle();
+    textAlign(CENTER);
+    textFont(myFont);
+    text("楽しかった！ : 1", width/2, height/3*1);
+    text("つまらなかった！ : 2", width/2, height/3*2);
     fill(0, 10);
     rect(-20, -20, width+40, height+40);
     popStyle();
-  } else {
+    for (int i = 0; i < 4; i++) {
+      if (button1[i] == true || button2[i] == true) {
+        answerFlag[i] = true;
+        if (button1[i] == true) {
+          enjoyFlag[i] = true ;
+          println("enjoy :"+i);
+        } else { 
+          enjoyFlag[i] = false;
+        }
+      }
+      if (answerFlag[0] == true && answerFlag[1] == true && answerFlag[2] == true && answerFlag[3] == true) {
+        answer = true;
+      }
+    }
+    if (_frameCount > timer*60 || answer == true) {
+      question = false;
+      title = true;
+      _frameCount = 0;
+    }
+    _frameCount++;
+  } else if (title){
     pushStyle();
-    fill(255);
+    fill(random(360),100,100);
     textAlign(CENTER);
-    PFont myFont = loadFont("HiraMinPro-W6-48.vlw");
+    shape(logo, width/2 - logo.width, height/5*2 -logo.height, logo.width* 2, logo.height*2);
     textFont(myFont);
-    text("Title", width/2, height/2);
+    text("Aボタンを押してね !", width/2, height/5 * 3);
     fill(0, 10);
     rect(-20, -20, width+40, height+40);
     popStyle();
@@ -339,6 +388,50 @@ void buttonA3(float _value) {
 void buttonA4(float _value) {
   if (_value > 0) {
     gameStart = true;
+  }
+}
+void button11(float _value) {
+  if (_value > 0) {
+    button1[0] = true;
+  } else {
+    button1[0] = false;
+  }
+}
+void button21(float _value) {
+  if (_value > 0) {
+    button2[0] = true;
+  } else {
+    button2[0] = false;
+  }
+}
+void button12(float _value) {
+  if (_value > 0) {
+    button1[1] = true;
+  }
+}
+void button22(float _value) {
+  if (_value > 0) {
+    button1[1] = false;
+  }
+}
+void button13(float _value) {
+  if (_value > 0) {
+    button1[2] = true;
+  }
+}
+void button23(float _value) {
+  if (_value > 0) {
+    button1[2] = false;
+  }
+}
+void button14(float _value) {
+  if (_value > 0) {
+    button1[3] = true;
+  }
+}
+void button24(float _value) {
+  if (_value > 0) {
+    button1[3] = false;
   }
 }
 
