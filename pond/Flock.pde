@@ -21,6 +21,9 @@ class Flock {
   void addBoid(Boid b) {
     boids.add(b);
   }
+  void removeBoid(Boid b) {
+    boids.remove(b);
+  }
   void addBarrier(Barrier b) {
     barriers.add(b);
   }
