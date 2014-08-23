@@ -1,3 +1,4 @@
+import processing.video.*;
 import processing.serial.*;
 import codeanticode.syphon.*;
 import processing.opengl.*;
@@ -11,11 +12,11 @@ import oscP5.*;
 import netP5.*;
 
 int numRipples = 10;
-int numFlocks = 300;
+int numFlocks = 150;
 int numBarriers = 5;
 int numWagara = 1;
 int interval = 0;
-int timer = 10;
+int timer = 30;
 String mouseMode = "PLAY";
 Boolean debug = false;
 color[] pixelBuffer;
@@ -37,13 +38,27 @@ float[] pitch = new float[4];
 float[] roll = new float[4];
 float[] yaw = new float[4];
 float[] accel = new float[4];
-float buttonA;
+
 boolean useOSC = true;
 boolean useSerial = false;
 float[] diffAccel = new float[4];
 float[] initAccel = new float[4];
 
-
+int selected = -1;  // 選択されている頂点
+int pos[][] = {
+  {
+    0, 0
+  }
+  , {
+    width, 0
+  }
+  , {
+    width, height
+  }
+  , {
+    0, height
+  }
+}; // 頂点座標
 
 PImage img;
 
@@ -58,16 +73,21 @@ boolean result = false;
 boolean question = false;
 boolean title = true;
 
-boolean[] button1 = new boolean[4];
-boolean[] button2 = new boolean[4];
-
+boolean[] button1 = {true,true,true,true};
+boolean[] buttonA = new boolean[4];
 boolean[] answerFlag = new boolean[4];
 boolean[] enjoyFlag = new boolean[4];
 boolean answer = false;
 
 int _frameCount = 0;
 
-PFont myFont = createFont("HiraMinPro-W6",50);
+String date;
+
+PFont myFont = createFont("HiraMinPro-W6", 50);
+
+PrintWriter writer;
+
+int hightScore = 0;
 
 void setup() {
   //base setting
@@ -77,6 +97,10 @@ void setup() {
   frameRate(30);
   smooth();
   //noCursor();
+
+  writer = createWriter(nf(year(), 4) + nf(month(), 2) + nf(day(), 2) + nf(hour(), 2) + nf(minute(), 2)+".csv");
+  date = nf(year(), 4) +"年"+ nf(month(), 2) +"月"+ nf(day(), 2) +"日"+ nf(hour(), 2) +"時"+ nf(minute(), 2) + "分" + nf(second(), 2) + "秒";
+  writer.println("日付,評価,スコア,プレイヤー番号");
 
   //Serial
   if (useSerial) {
@@ -94,18 +118,9 @@ void setup() {
 
   //flock
   flock = new Flock();
-  for (int i = 0; i < 20; i++) {
-    int flockType = Math.round(random(3, 4));
-    flock.addBoid(new Boid(random(width), random(height), flockType));
-  }
+
   nets = new ArrayList<Net>();
   ripples = new ArrayList<Ripple>();
-
-  //  wagara = new ArrayList<PixelArt>();
-  //  for (int i = 0; i < numWagara; i++) {
-  //    wagaraImg = loadImage("http://image.mapple.net/ocol/photol/00/00/00/18/54_120061103_1_1.jpg");
-  //    wagara.add(new PixelArt(random(width),random(height),wagaraImg));
-  //  }
   float posX = width / 4;
   float posY = height / 4;
   nets.add(new Net(posX*1, posY*1, 100, 0));
@@ -120,8 +135,12 @@ void setup() {
       osc.plug(this, "pry"+i, "/wii/"+i+"/accel/pry");
       osc.plug(this, "accel"+i, "/wii/"+i+"/accel/xyz");
       osc.plug(this, "buttonA"+i, "/wii/"+i+"/button/A");
-      osc.plug(this, "button1"+i, "/wii/"+i+"/button/A");
-      osc.plug(this, "button2"+i, "/wii/"+i+"/button/A");
+      osc.plug(this, "button1"+i, "/wii/"+i+"/button/1");
+      osc.plug(this, "button2"+i, "/wii/"+i+"/button/2");
+      osc.plug(this, "up"+i, "/wii/"+i+"/button/Up");
+      osc.plug(this, "right"+i, "/wii/"+i+"/button/Right");
+      osc.plug(this, "left"+i, "/wii/"+i+"/button/Left");
+      osc.plug(this, "down"+i, "/wii/"+i+"/button/Down");
     }
   }
 
@@ -131,6 +150,7 @@ void setup() {
 }
 
 void draw() {
+  
   if (gameStart) {
     pushStyle();
     fill(0, 10);
@@ -141,19 +161,13 @@ void draw() {
     blendMode(ADD);
     //flock
     flock.run();
-
-    //  for (PixelArt w : wagara) {
-    //    w.update();
-    //    w.move(mouseX,mouseY);
-    //  }
     for (int i = 0; i < nets.size (); i++) {
       Net n = nets.get(i);
       n.run();
       //n.move(width/2 + width*roll[i],height/2 + height*pitch[i]);
       diffAccel[i] = initAccel[i] - accel[i];
       initAccel[i] = accel[i];
-      //println(" accel"+0+":"+ diffAccel[0]);
-      if (abs(diffAccel[i]) > 0.1) {
+      if (abs(diffAccel[i]) > 0.15) {
         n.catchCarp(flock.boids);
       }
     }
@@ -164,9 +178,9 @@ void draw() {
         ripples.remove(i);
       }
     }
-    if (frameCount % 30 == int(random(2))) {
+    if (frameCount % 10 == int(random(3))) {
       if (flock.boids.size() < numFlocks) {
-        for (int i = 0; i < int (random (10)); i++) {
+        for (int i = 0; i < int (random (30)); i++) {
           int flockType = Math.round(random(3, 4));
           flock.addBoid(new Boid(random(width), random(height), flockType));
         }
@@ -175,100 +189,165 @@ void draw() {
       int rippleY = int(random(200, height - 200));
       flock.pull(rippleX, rippleY);
       ripples.add(new Ripple(rippleX, rippleY, random(5, 10), int(random(180, 200))));
-    }
+    } 
     if (_frameCount > timer*30) {
       gameStart = false;
       result = true;
+      question = false;
+      title = false;
       _frameCount = 0;
     }
     popStyle();
     _frameCount++;
   } else if (result) {
-    pushStyle();
-    textAlign(CENTER);
-    textFont(myFont);
-    for (int i = 0; i < nets.size (); i++) {
-      Net n = nets.get(i);
-      fill(90*i, 50, 100);
-      text(n.score, width/2, height/5 * (i +1));
+    //スコア表示画面
+    float posX = width / 4;
+    float posY = height / 4;
+    nets.get(0).move(posX*1, posY*1);
+    nets.get(1).move(posX*3, posY*1);
+    nets.get(2).move(posX*1, posY*3);
+    nets.get(3).move(posX*3, posY*3);
+    for (int i = 0; i < flock.boids.size(); i++) {
+        flock.boids.remove(i);
     }
-    fill(0, 100);
+    pushStyle();
+    fill(0, 10);
     rect(-20, -20, width+40, height+40);
     popStyle();
+    pushStyle();
+    blendMode(ADD);
+    textAlign(CENTER);
+    textFont(myFont, 100);
+    text("スコア", width/2, height/10*5);
+    for (int i = 0; i < nets.size (); i++) {
+      Net n = nets.get(i);
+      n.is_score = true;
+      if (n.score > hightScore) {
+        hightScore = n.score;
+      }
+      n.run();
+    }
+    for (int i = 0; i < nets.size (); i++) {
+      Net n = nets.get(i);
+      if(n.score == hightScore) {
+        n.isHightScore = true;
+      }
+    }
+    popStyle();
+    //10秒たったら画面遷移
     if (_frameCount > timer*10) {
+      for (int i = 0; i < nets.size (); i++) {
+        Net n = nets.get(i);
+        n.isHightScore = false;
+      }
+      gameStart = false;
       result = false;
       question = true;
+      title = false;
       _frameCount = 0;
     }
     _frameCount++;
   } else if (question) {
+    //アンケート画面
     pushStyle();
-    textAlign(CENTER);
-    textFont(myFont);
-    text("楽しかった！ : 1", width/2, height/3*1);
-    text("つまらなかった！ : 2", width/2, height/3*2);
     fill(0, 10);
     rect(-20, -20, width+40, height+40);
     popStyle();
-    for (int i = 0; i < 4; i++) {
-      if (button1[i] == true || button2[i] == true) {
-        answerFlag[i] = true;
-        if (button1[i] == true) {
-          enjoyFlag[i] = true ;
-          println("enjoy :"+i);
-        } else { 
-          enjoyFlag[i] = false;
+    pushStyle();
+    blendMode(ADD);
+    textAlign(CENTER);
+    textFont(myFont, 90);
+    text("アンケート", width/2, height/11*3);
+    textFont(myFont, 50);
+    text("楽しかった: 1", width/2, height/11*5);
+    text("つまらなかった: 2", width/2, height/11*6);
+    text("決定: A", width/2, height/11*8);
+    for (int i = 0; i < nets.size (); i++) {
+      Net n = nets.get(i);
+      n.is_score = false;
+      n.is_question = true;
+      n.run();
+      if (n.answer == false) {
+        if (button1[i]) {
+          n.question = 1;
+        } else {
+          n.question = 2;
+        }
+        if (buttonA[i]) {
+          n.answer();
+          writer.println(date+","+n.question+","+n.score+","+i);
+          answerFlag[i]= true;
+          writer.flush();
         }
       }
-      if (answerFlag[0] == true && answerFlag[1] == true && answerFlag[2] == true && answerFlag[3] == true) {
-        answer = true;
-      }
     }
-    if (_frameCount > timer*60 || answer == true) {
+    if (answerFlag[0] == true && answerFlag[1] == true && answerFlag[2] == true && answerFlag[3] == true) {
+      answer = true;
+    }
+    popStyle();
+    if (_frameCount > timer*20 || answer == true) {
+      gameStart = false;
+      result = false;
       question = false;
       title = true;
+      for (int i = 0; i < nets.size (); i++) {
+        Net n = nets.get(i);
+        n.is_question = false;
+        n.answer = false;
+      }
       _frameCount = 0;
     }
     _frameCount++;
-  } else if (title){
+  } else if (title) {
     pushStyle();
-    fill(random(360),100,100);
+    blendMode(ADD);
+    fill(0, 10);
+    rect(-20, -20, width+40, height+40);
+    popStyle();
+    pushStyle();
+    fill(random(360), 50, 100);
     textAlign(CENTER);
     shape(logo, width/2 - logo.width, height/5*2 -logo.height, logo.width* 2, logo.height*2);
     textFont(myFont);
     text("Aボタンを押してね !", width/2, height/5 * 3);
+    for (int i = 0; i < ripples.size (); i++) {
+      Ripple r = ripples.get(i);
+      r.run();
+      if (r.flag = false) {
+        ripples.remove(i);
+      }
+    }
+    if (frameCount % 10 == int(random(3))) {
+      int rippleX = int(random(200, width - 200));
+      int rippleY = int(random(200, height - 200));
+      flock.pull(rippleX, rippleY);
+      ripples.add(new Ripple(rippleX, rippleY, random(5, 10), int(random(360))));
+    }
     fill(0, 10);
     rect(-20, -20, width+40, height+40);
     popStyle();
+    
+    if (keyPressed) {
+      gameStart = true;
+    }
+    for (int i = 0; i < 4; i++) {
+      if (buttonA[i]) {
+      gameStart = true;
+      result = false;
+      question = false;
+      title = false;
+      }
+    }
+    _frameCount = 0;
+    
   }
   server.sendImage(g);
 }
 
 void mousePressed() {
-  if ( mouseMode == "PLAY" ) {
-    flock.pull(mouseX, mouseY);
-  } else if ( mouseMode == "ADD" ) {
-    int flockType = Math.round(random(0, 4));
-    flock.addBoid(new Boid(mouseX, mouseY, flockType));
-    seAdd.play();
-    seAdd.rewind();
-  } else if ( mouseMode == "BARRIER" ) {
-    flock.addBarrier(new Barrier(mouseX, mouseY, random(90)));
-  }
 }
 
 void keyPressed() {
-  switch(key) {
-  case 1:
-    mouseMode = "PLAY";
-    break;
-  case 2:
-    mouseMode = "ADD";
-    break;
-  case 3:
-    mouseMode = "BARRIER";
-    break;
-  }
 }
 void serialEvent(Serial p) {
   String sensorString = port.readStringUntil('\n');
@@ -338,11 +417,11 @@ void stop() {
   bgm.close();
   minim.stop();
   super.stop();
+  writer.flush(); 
+  writer.close();
+  exit();
 }
 void accel1(float _x, float _y, float _z) {
-  //  println("x:"+ _x);
-  //  println("y:"+ _y);
-  //  println("z:"+ _z);
 }
 
 void pry1(float _pitch, float _roll, float _yaw, float _accel) {
@@ -372,36 +451,40 @@ void pry4(float _pitch, float _roll, float _yaw, float _accel) {
 
 void buttonA1(float _value) {
   if (_value > 0) {
-    gameStart = true;
+    buttonA[0] = true;
+  } else {
+    buttonA[0] = false;
   }
 }
 void buttonA2(float _value) {
   if (_value > 0) {
-    gameStart = true;
+    buttonA[1] = true;
+  } else {
+    buttonA[1] = false;
   }
 }
 void buttonA3(float _value) {
   if (_value > 0) {
-    gameStart = true;
+    buttonA[2] = true;
+  } else {
+    buttonA[2] = false;
   }
 }
 void buttonA4(float _value) {
   if (_value > 0) {
-    gameStart = true;
+    buttonA[3] = true;
+  } else {
+    buttonA[3] = false;
   }
 }
 void button11(float _value) {
   if (_value > 0) {
     button1[0] = true;
-  } else {
-    button1[0] = false;
   }
 }
 void button21(float _value) {
   if (_value > 0) {
-    button2[0] = true;
-  } else {
-    button2[0] = false;
+    button1[0] = false;
   }
 }
 void button12(float _value) {
@@ -434,4 +517,105 @@ void button24(float _value) {
     button1[3] = false;
   }
 }
+void up1(float _value) {
+  if(gameStart) {
+    Net n = nets.get(0);
+    n.move(n.location.x,n.location.y - 10);
+  }
+}
+void up2(float _value) {
+  if(gameStart) {
+    Net n = nets.get(1);
+    n.move(n.location.x,n.location.y - 10);
+  }
+}
+void up3(float _value) {
+  if(gameStart) {
+    Net n = nets.get(2);
+    n.move(n.location.x,n.location.y - 10);
+  }
+}
+void up4(float _value) {
+  if(gameStart) {
+    Net n = nets.get(3);
+    n.move(n.location.x,n.location.y - 10);
+  }
+}
+void left1(float _value) {
+  if(gameStart) {
+    Net n = nets.get(0);
+    n.move(n.location.x - 10,n.location.y);
+  }
+}
+void left2(float _value) {
+  if(gameStart) {
+    Net n = nets.get(1);
+    n.move(n.location.x - 10,n.location.y);
+  }
+}
+void left3(float _value) {
+  if(gameStart) {
+    Net n = nets.get(2);
+    n.move(n.location.x - 10,n.location.y);
+  }
+}
+void left4(float _value) {
+  if(gameStart) {
+    Net n = nets.get(3);
+    n.move(n.location.x - 10,n.location.y);
+  }
+}
+void right1(float _value) {
+  if(gameStart) {
+    Net n = nets.get(0);
+    n.move(n.location.x + 10,n.location.y);
+  }
+}
+void right2(float _value) {
+  if(gameStart) {
+    Net n = nets.get(1);
+    n.move(n.location.x + 10,n.location.y);
+  }
+}
+void right3(float _value) {
+  if(gameStart) {
+    Net n = nets.get(2);
+    n.move(n.location.x + 10,n.location.y);
+  }
+}
+void right4(float _value) {
+  if(gameStart) {
+    Net n = nets.get(3);
+    n.move(n.location.x + 10,n.location.y);
+  }
+}
+void down1(float _value) {
+  if(gameStart) {
+    Net n = nets.get(0);
+    n.move(n.location.x,n.location.y + 10);
+  }
+}
+void down2(float _value) {
+  if(gameStart) {
+    Net n = nets.get(1);
+    n.move(n.location.x,n.location.y + 10);
+  }
+}
+void down3(float _value) {
+  if(gameStart) {
+    Net n = nets.get(2);
+    n.move(n.location.x,n.location.y + 10);
+  }
+}
+void down4(float _value) {
+  if(gameStart) {
+    Net n = nets.get(3);
+    n.move(n.location.x,n.location.y + 10);
+  }
+}
+
+
+
+
+
 
