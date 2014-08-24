@@ -12,7 +12,7 @@ import oscP5.*;
 import netP5.*;
 
 int numRipples = 10;
-int numFlocks = 150;
+int numFlocks = 100;
 int numBarriers = 5;
 int numWagara = 1;
 int interval = 0;
@@ -73,7 +73,9 @@ boolean result = false;
 boolean question = false;
 boolean title = true;
 
-boolean[] button1 = {true,true,true,true};
+boolean[] button1 = {
+  true, true, true, true
+};
 boolean[] buttonA = new boolean[4];
 boolean[] answerFlag = new boolean[4];
 boolean[] enjoyFlag = new boolean[4];
@@ -123,7 +125,7 @@ void setup() {
   ripples = new ArrayList<Ripple>();
   float posX = width / 4;
   float posY = height / 4;
-  nets.add(new Net(posX*1, posY*1, 100, 0));
+  nets.add(new Net(posX*1, posY*1, 100, 30));
   nets.add(new Net(posX*3, posY*1, 100, 90));
   nets.add(new Net(posX*1, posY*3, 100, 180));
   nets.add(new Net(posX*3, posY*3, 100, 270));
@@ -150,7 +152,9 @@ void setup() {
 }
 
 void draw() {
-  
+  pushStyle();
+
+  popStyle();
   if (gameStart) {
     pushStyle();
     fill(0, 10);
@@ -164,6 +168,7 @@ void draw() {
     for (int i = 0; i < nets.size (); i++) {
       Net n = nets.get(i);
       n.run();
+      n.answer = false;
       //n.move(width/2 + width*roll[i],height/2 + height*pitch[i]);
       diffAccel[i] = initAccel[i] - accel[i];
       initAccel[i] = accel[i];
@@ -174,21 +179,23 @@ void draw() {
     for (int i = 0; i < ripples.size (); i++) {
       Ripple r = ripples.get(i);
       r.run();
-      if (r.flag = false) {
+      if (r.flag == false) {
         ripples.remove(i);
       }
     }
     if (frameCount % 10 == int(random(3))) {
       if (flock.boids.size() < numFlocks) {
-        for (int i = 0; i < int (random (30)); i++) {
+        for (int i = 0; i < int (random (6)); i++) {
           int flockType = Math.round(random(3, 4));
           flock.addBoid(new Boid(random(width), random(height), flockType));
         }
       }
-      int rippleX = int(random(200, width - 200));
-      int rippleY = int(random(200, height - 200));
-      flock.pull(rippleX, rippleY);
-      ripples.add(new Ripple(rippleX, rippleY, random(5, 10), int(random(180, 200))));
+      if (ripples.size() < numRipples) {
+        int rippleX = int(random(200, width - 200));
+        int rippleY = int(random(200, height - 200));
+        flock.pull(rippleX, rippleY);
+        ripples.add(new Ripple(rippleX, rippleY, random(5, 10), int(random(180, 200))));
+      }
     } 
     if (_frameCount > timer*30) {
       gameStart = false;
@@ -207,8 +214,8 @@ void draw() {
     nets.get(1).move(posX*3, posY*1);
     nets.get(2).move(posX*1, posY*3);
     nets.get(3).move(posX*3, posY*3);
-    for (int i = 0; i < flock.boids.size(); i++) {
-        flock.boids.remove(i);
+    for (int i = 0; i < flock.boids.size (); i++) {
+      flock.boids.remove(i);
     }
     pushStyle();
     fill(0, 10);
@@ -226,27 +233,29 @@ void draw() {
         hightScore = n.score;
       }
       n.run();
+      n.answer = false;
     }
     for (int i = 0; i < nets.size (); i++) {
       Net n = nets.get(i);
-      if(n.score == hightScore) {
+      if (n.score == hightScore) {
         n.isHightScore = true;
       }
     }
     popStyle();
+    _frameCount++;
     //10秒たったら画面遷移
-    if (_frameCount > timer*10) {
+    if (_frameCount > timer*5) {
       for (int i = 0; i < nets.size (); i++) {
         Net n = nets.get(i);
         n.isHightScore = false;
+        n.answer = false;
       }
+      _frameCount = 0;
       gameStart = false;
       result = false;
       question = true;
       title = false;
-      _frameCount = 0;
     }
-    _frameCount++;
   } else if (question) {
     //アンケート画面
     pushStyle();
@@ -278,6 +287,7 @@ void draw() {
           writer.println(date+","+n.question+","+n.score+","+i);
           answerFlag[i]= true;
           writer.flush();
+          n.score = 0;
         }
       }
     }
@@ -285,7 +295,8 @@ void draw() {
       answer = true;
     }
     popStyle();
-    if (_frameCount > timer*20 || answer == true) {
+    _frameCount++;
+    if (_frameCount > timer*60 || answer == true) {
       gameStart = false;
       result = false;
       question = false;
@@ -294,11 +305,12 @@ void draw() {
         Net n = nets.get(i);
         n.is_question = false;
         n.answer = false;
+        n.score = 0;
       }
       _frameCount = 0;
     }
-    _frameCount++;
   } else if (title) {
+    _frameCount++;
     pushStyle();
     blendMode(ADD);
     fill(0, 10);
@@ -313,33 +325,31 @@ void draw() {
     for (int i = 0; i < ripples.size (); i++) {
       Ripple r = ripples.get(i);
       r.run();
-      if (r.flag = false) {
+      if (r.flag == false) {
         ripples.remove(i);
       }
     }
     if (frameCount % 10 == int(random(3))) {
-      int rippleX = int(random(200, width - 200));
-      int rippleY = int(random(200, height - 200));
-      flock.pull(rippleX, rippleY);
-      ripples.add(new Ripple(rippleX, rippleY, random(5, 10), int(random(360))));
+      if (ripples.size() < numRipples) {
+        int rippleX = int(random(200, width - 200));
+        int rippleY = int(random(200, height - 200));
+        flock.pull(rippleX, rippleY);
+        ripples.add(new Ripple(rippleX, rippleY, random(5, 10), int(random(360))));
+      }
     }
     fill(0, 10);
     rect(-20, -20, width+40, height+40);
     popStyle();
     
-    if (keyPressed) {
-      gameStart = true;
-    }
     for (int i = 0; i < 4; i++) {
-      if (buttonA[i]) {
-      gameStart = true;
-      result = false;
-      question = false;
-      title = false;
+      if (buttonA[i] || _frameCount > timer * 10) {
+        _frameCount = 0;
+        gameStart = true;
+        result = false;
+        question = false;
+        title = false;
       }
     }
-    _frameCount = 0;
-    
   }
   server.sendImage(g);
 }
@@ -518,103 +528,101 @@ void button24(float _value) {
   }
 }
 void up1(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(0);
-    n.move(n.location.x,n.location.y - 10);
+    n.move(n.location.x, n.location.y + 10);
   }
 }
 void up2(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(1);
-    n.move(n.location.x,n.location.y - 10);
+    n.move(n.location.x, n.location.y + 10);
   }
 }
 void up3(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(2);
-    n.move(n.location.x,n.location.y - 10);
+    n.move(n.location.x, n.location.y - 10);
   }
 }
 void up4(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(3);
-    n.move(n.location.x,n.location.y - 10);
+    n.move(n.location.x, n.location.y - 10);
   }
 }
 void left1(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(0);
-    n.move(n.location.x - 10,n.location.y);
+    n.move(n.location.x + 10, n.location.y);
   }
 }
 void left2(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(1);
-    n.move(n.location.x - 10,n.location.y);
+    n.move(n.location.x + 10, n.location.y);
   }
 }
 void left3(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(2);
-    n.move(n.location.x - 10,n.location.y);
+    n.move(n.location.x - 10, n.location.y);
   }
 }
 void left4(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(3);
-    n.move(n.location.x - 10,n.location.y);
+    n.move(n.location.x - 10, n.location.y);
   }
 }
 void right1(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(0);
-    n.move(n.location.x + 10,n.location.y);
+    n.move(n.location.x - 10, n.location.y);
   }
 }
 void right2(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(1);
-    n.move(n.location.x + 10,n.location.y);
+    n.move(n.location.x - 10, n.location.y);
   }
 }
 void right3(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(2);
-    n.move(n.location.x + 10,n.location.y);
+    n.move(n.location.x + 10, n.location.y);
   }
 }
 void right4(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(3);
-    n.move(n.location.x + 10,n.location.y);
+    n.move(n.location.x + 10, n.location.y);
   }
 }
 void down1(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(0);
-    n.move(n.location.x,n.location.y + 10);
+    n.move(n.location.x, n.location.y - 10);
   }
 }
 void down2(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(1);
-    n.move(n.location.x,n.location.y + 10);
+    n.move(n.location.x, n.location.y - 10);
   }
 }
 void down3(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(2);
-    n.move(n.location.x,n.location.y + 10);
+    n.move(n.location.x, n.location.y + 10);
   }
 }
 void down4(float _value) {
-  if(gameStart) {
+  if (gameStart) {
     Net n = nets.get(3);
-    n.move(n.location.x,n.location.y + 10);
+    n.move(n.location.x, n.location.y + 10);
   }
 }
-
-
 
 
 
