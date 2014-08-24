@@ -33,7 +33,6 @@ public class Ripple {
     colorMode(HSB);
     noFill();
     drawEllipseRipple();
-
     popStyle();
   }
 
